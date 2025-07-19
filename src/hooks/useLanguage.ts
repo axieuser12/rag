@@ -1,38 +1,16 @@
 import { useState, useEffect } from 'react';
 import { translations } from '../types/language';
 
-// Secure local storage with validation and error handling
-const STORAGE_KEY = 'axie-studio-rag-language';
-const VALID_LANGUAGES = ['sv', 'en'];
-
-const getStoredLanguage = (): string => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored && VALID_LANGUAGES.includes(stored)) {
-      return stored;
-    }
-  } catch (error) {
-    console.warn('Failed to read language from localStorage:', error);
-  }
-  return 'sv'; // Default to Swedish
-};
-
-const setStoredLanguage = (language: string): void => {
-  try {
-    if (VALID_LANGUAGES.includes(language)) {
-      localStorage.setItem(STORAGE_KEY, language);
-    }
-  } catch (error) {
-    console.warn('Failed to save language to localStorage:', error);
-  }
-};
-
 export const useLanguage = () => {
-  const [currentLanguage, setCurrentLanguage] = useState<string>(getStoredLanguage);
+  const [currentLanguage, setCurrentLanguage] = useState<string>(() => {
+    // Check localStorage first, then default to Swedish
+    const saved = localStorage.getItem('rag-language');
+    return saved || 'sv';
+  });
 
   useEffect(() => {
-    // Save language preference to localStorage securely
-    setStoredLanguage(currentLanguage);
+    // Save language preference to localStorage
+    localStorage.setItem('rag-language', currentLanguage);
     
     // Update document language attribute
     document.documentElement.lang = currentLanguage;
@@ -47,9 +25,7 @@ export const useLanguage = () => {
   };
 
   const switchLanguage = (languageCode: string) => {
-    if (VALID_LANGUAGES.includes(languageCode)) {
-      setCurrentLanguage(languageCode);
-    }
+    setCurrentLanguage(languageCode);
   };
 
   return {

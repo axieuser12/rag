@@ -5,26 +5,22 @@ import { useLanguage } from '../hooks/useLanguage';
 interface FileUploaderProps {
   onFilesSelected: (files: File[]) => void;
   selectedFiles: File[];
-  maxFiles?: number;
 }
 
-const FileUploader: React.FC<FileUploaderProps> = ({ 
-  onFilesSelected, 
-  selectedFiles, 
-  maxFiles = 5 
-}) => {
+const FileUploader: React.FC<FileUploaderProps> = ({ onFilesSelected, selectedFiles }) => {
   const { t } = useLanguage();
   const [isDragOver, setIsDragOver] = useState(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const newFiles = Array.from(event.target.files);
-      // Apply persistent file limit
-      const limitedFiles = newFiles.slice(0, maxFiles);
+      // Limit to 5 files and show feedback
+      const limitedFiles = newFiles.slice(0, 5);
       onFilesSelected(limitedFiles);
       
-      if (newFiles.length > maxFiles) {
-        console.log(`File limit reached: Only first ${maxFiles} files selected`);
+      if (newFiles.length > 5) {
+        // Could add a toast notification here if needed
+        console.log('File limit reached: Only first 5 files selected');
       }
     }
   };
@@ -34,12 +30,13 @@ const FileUploader: React.FC<FileUploaderProps> = ({
     setIsDragOver(false);
     if (event.dataTransfer.files) {
       const newFiles = Array.from(event.dataTransfer.files);
-      // Apply persistent file limit
-      const limitedFiles = newFiles.slice(0, maxFiles);
+      // Limit to 5 files and show feedback
+      const limitedFiles = newFiles.slice(0, 5);
       onFilesSelected(limitedFiles);
       
-      if (newFiles.length > maxFiles) {
-        console.log(`File limit reached: Only first ${maxFiles} files selected`);
+      if (newFiles.length > 5) {
+        // Could add a toast notification here if needed
+        console.log('File limit reached: Only first 5 files selected');
       }
     }
   }, [onFilesSelected]);
