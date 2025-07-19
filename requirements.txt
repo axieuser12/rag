@@ -1,24 +1,29 @@
-# Core dependencies
+# Core Flask dependencies
 flask==3.0.0
 flask-cors==4.0.0
 gunicorn==21.2.0
 werkzeug==3.0.1
 
-# AI and ML
+# AI and ML - OpenAI
 openai==1.12.0
 tiktoken==0.6.0
 
-# Database
+# Database - Supabase
 supabase==2.3.4
 psycopg2-binary==2.9.9
 
-# File processing
+# File processing libraries
 PyPDF2==3.0.1
 python-docx==1.1.0
 pandas==2.2.0
+openpyxl==3.1.2
 
-# Text processing
+# Text processing and encoding
+chardet==5.2.0
+python-magic-bin==0.4.14
 langchain==0.1.9
+langchain-text-splitters==0.0.1
 
 # Utilities
 python-dotenv==1.0.1
+requests==2.31.0
