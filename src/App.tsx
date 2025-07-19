@@ -30,6 +30,7 @@ interface Credentials {
 
 function App() {
   const { t } = useLanguage();
+  const MAX_FILE_LIMIT = 5;
   const [files, setFiles] = useState<File[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<ProcessingResult | null>(null);
@@ -52,7 +53,7 @@ function App() {
 
   const handleFilesSelected = useCallback((selectedFiles: File[]) => {
     // Limit to 5 files maximum
-    const limitedFiles = selectedFiles.slice(0, 5);
+    const limitedFiles = selectedFiles.slice(0, MAX_FILE_LIMIT);
     setFiles(limitedFiles);
     setResult(null);
   }, []);
@@ -66,7 +67,7 @@ function App() {
 
   const handleProcess = async () => {
     if (files.length === 0) return;
-    if (files.length > 5) return; // Additional safety check
+    if (files.length > MAX_FILE_LIMIT) return; // Additional safety check
     if (!credentials) {
       setShowCredentials(true);
       return;
@@ -172,7 +173,7 @@ function App() {
               <FileUploader 
                 onFilesSelected={handleFilesSelected}
                 selectedFiles={files}
-                maxFiles={maxFiles}
+                maxFiles={MAX_FILE_LIMIT}
               />
 
               {files.length > 0 && (
@@ -180,6 +181,7 @@ function App() {
                   <button
                     onClick={handleProcess}
                     disabled={isProcessing || !credentials || files.length > 5}
+                    disabled={isProcessing || !credentials || files.length > MAX_FILE_LIMIT}
                     className="flex items-center px-6 py-3 bg-white text-purple-600 rounded-lg font-semibold hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isProcessing ? (
@@ -188,6 +190,7 @@ function App() {
                         {t('processing')}
                       </>
                     ) : files.length > 5 ? (
+                    ) : files.length > MAX_FILE_LIMIT ? (
                       <>
                         <AlertCircle className="w-5 h-5 mr-2" />
                         {t('fileLimitReached')}
@@ -211,6 +214,7 @@ function App() {
               )}
 
               {files.length > 5 && (
+              {files.length > MAX_FILE_LIMIT && (
                 <div className="mt-4 p-4 bg-orange-500/20 border border-orange-400/30 rounded-lg">
                   <p className="text-orange-200 text-center flex items-center justify-center">
                     <AlertCircle className="w-5 h-5 mr-2" />
