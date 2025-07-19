@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import { Upload, FileText, Database, CheckCircle, AlertCircle, Loader2, Brain, Zap, Settings, Key, Shield } from 'lucide-react';
-import FileUploader from './components/FileUploader';
-import ProcessingStatus from './components/ProcessingStatus';
-import ResultsDisplay from './components/ResultsDisplay';
-import CredentialsForm from './components/CredentialsForm';
+import FileUploader from './components/FileUploader.tsx';
+import ProcessingStatus from './components/ProcessingStatus.tsx';
+import ResultsDisplay from './components/ResultsDisplay.tsx';
+import CredentialsForm from './components/CredentialsForm.tsx';
 
 interface ProcessingResult {
   success: boolean;
