@@ -13,6 +13,7 @@ import traceback
 from pathlib import Path
 from typing import Dict, Any
 from flask import Flask, request, jsonify
+from flask import send_from_directory
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from universal_file_processor import UniversalFileProcessor
@@ -160,7 +161,7 @@ def index():
     """Serve the main page"""
     # In production, serve the built React app
     if os.path.exists('dist/index.html'):
-        return app.send_static_file('dist/index.html')
+        return send_from_directory('dist', 'index.html')
     
     # Fallback HTML for development
     return """
@@ -367,28 +368,33 @@ def process_files():
             "error": str(e)
         }), 500
 
+# Static file serving for production
+@app.route('/assets/<path:path>')
+def serve_assets(path):
+    """Serve static assets"""
+    if os.path.exists('dist/assets'):
+        return send_from_directory('dist/assets', path)
+    return "Asset not found", 404
+
+@app.route('/<path:path>')
+def serve_static(path):
+    """Serve static files and handle SPA routing"""
+    if os.path.exists('dist'):
+        # Try to serve the requested file
+        try:
+            return send_from_directory('dist', path)
+        except:
+            # If file doesn't exist, serve index.html for SPA routing
+            if os.path.exists('dist/index.html'):
+                return send_from_directory('dist', 'index.html')
+    return "File not found", 404
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
     
     # Production environment detection
     is_production = os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("RENDER") or not debug_mode
-    
-    # Serve static files in production
-    if is_production and os.path.exists('dist'):
-        from flask import send_from_directory
-        
-        @app.route('/<path:path>')
-        def serve_static(path):
-            try:
-                return send_from_directory('dist', path)
-            except:
-                # Fallback to index.html for SPA routing
-                return send_from_directory('dist', 'index.html')
-        
-        @app.route('/assets/<path:path>')
-        def serve_assets(path):
-            return send_from_directory('dist/assets', path)
     
     logger.info(f"Starting server on port {port}, debug={debug_mode}")
     
