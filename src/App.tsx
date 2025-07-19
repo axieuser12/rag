@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Upload, FileText, Database, CheckCircle, AlertCircle, Loader2, Brain, Zap, Settings, Key, Shield } from 'lucide-react';
 import FileUploader from './components/FileUploader.tsx';
 import ProcessingStatus from './components/ProcessingStatus.tsx';
@@ -26,12 +27,28 @@ function App() {
   const [credentials, setCredentials] = useState<Credentials | null>(null);
   const [showCredentials, setShowCredentials] = useState(false);
 
+  // Load credentials from localStorage on component mount
+  useEffect(() => {
+    const savedCredentials = localStorage.getItem('rag-credentials');
+    if (savedCredentials) {
+      try {
+        const parsed = JSON.parse(savedCredentials);
+        setCredentials(parsed);
+      } catch (error) {
+        console.error('Error parsing saved credentials:', error);
+        localStorage.removeItem('rag-credentials');
+      }
+    }
+  }, []);
+
   const handleFilesSelected = useCallback((selectedFiles: File[]) => {
     setFiles(selectedFiles);
     setResult(null);
   }, []);
 
   const handleCredentialsSubmit = useCallback((creds: Credentials) => {
+    // Save credentials to localStorage
+    localStorage.setItem('rag-credentials', JSON.stringify(creds));
     setCredentials(creds);
     setShowCredentials(false);
   }, []);
@@ -81,6 +98,7 @@ function App() {
   };
 
   const handleClearCredentials = () => {
+    localStorage.removeItem('rag-credentials');
     setCredentials(null);
     setShowCredentials(true);
   };
