@@ -11,13 +11,10 @@ export default defineConfig({
     host: true,
     port: 5173,
     proxy: {
-      '/process-files': {
+      '/api': {
         target: 'http://localhost:8000',
-        changeOrigin: true
-      },
-      '/health': {
-        target: 'http://localhost:8000',
-        changeOrigin: true
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
   }

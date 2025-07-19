@@ -293,6 +293,7 @@ def index():
 @app.route('/process-files', methods=['POST'])
 def process_files():
     """Handle file upload and processing"""
+    logger.info("Received file processing request")
     try:
         # Extract credentials from form data
         credentials = {
@@ -312,6 +313,7 @@ def process_files():
         
         # Check if files were uploaded
         if not request.files:
+            logger.warning("No files in request")
             return jsonify({
                 "success": False,
                 "message": "No files were uploaded"
@@ -344,6 +346,7 @@ def process_files():
             logger.info(f"Processing {files_saved} files with user credentials")
             # Process the uploaded files with user credentials
             result = process_files_with_credentials(temp_dir, credentials)
+            logger.info(f"Processing result: {result.get('success', False)}")
             return jsonify(result)
             
         finally:
