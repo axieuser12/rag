@@ -11,11 +11,14 @@ import time
 import signal
 from threading import Thread
 
+# Define the project directory
+PROJECT_DIR = "project-bolt-github-v82hbkom/project"
+
 def start_backend():
     """Start the Python Flask backend"""
     print("🐍 Starting Python backend...")
     try:
-        subprocess.run([sys.executable, "web_server.py"], check=True)
+        subprocess.run([sys.executable, "web_server.py"], cwd=PROJECT_DIR, check=True)
     except KeyboardInterrupt:
         print("\n🛑 Backend stopped")
     except Exception as e:
@@ -25,7 +28,7 @@ def start_frontend():
     """Start the React frontend"""
     print("⚛️  Starting React frontend...")
     try:
-        subprocess.run(["npm", "run", "dev"], check=True)
+        subprocess.run(["npm", "run", "dev"], cwd=PROJECT_DIR, check=True)
     except KeyboardInterrupt:
         print("\n🛑 Frontend stopped")
     except Exception as e:
@@ -44,9 +47,9 @@ def main():
         sys.exit(1)
     
     # Check if dependencies are installed
-    if not os.path.exists("node_modules"):
+    if not os.path.exists(os.path.join(PROJECT_DIR, "node_modules")):
         print("📦 Installing npm dependencies...")
-        subprocess.run(["npm", "install"], check=True)
+        subprocess.run(["npm", "install"], cwd=PROJECT_DIR, check=True)
     
     try:
         # Start backend in a separate thread
