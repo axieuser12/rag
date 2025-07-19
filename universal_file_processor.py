@@ -5,27 +5,54 @@ import tiktoken
 import chardet
 from pathlib import Path
 from typing import List, Dict, Any
-try:
-    from langchain.text_splitter import RecursiveCharacterTextSplitter
-except ImportError:
-    try:
-        from langchain_text_splitters import RecursiveCharacterTextSplitter
-    except ImportError:
-        # Fallback text splitter if langchain is not available
-        class RecursiveCharacterTextSplitter:
-            def __init__(self, chunk_size=800, chunk_overlap=100, **kwargs):
-                self.chunk_size = chunk_size
-                self.chunk_overlap = chunk_overlap
-            
-            def split_text(self, text):
-                chunks = []
-                start = 0
-                while start < len(text):
-                    end = start + self.chunk_size
-                    chunk = text[start:end]
-                    chunks.append(chunk)
-                    start = end - self.chunk_overlap
+
+# Simple text splitter implementation
+class SimpleTextSplitter:
+    def __init__(self, chunk_size=800, chunk_overlap=100, separators=None):
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+        self.separators = separators or ["\n\n", "\n", ". ", " ", ""]
+    
+    def split_text(self, text):
+        if len(text) <= self.chunk_size:
+            return [text]
+        
+        chunks = []
+        current_chunk = ""
+        
+        # Split by separators in order of preference
+        for separator in self.separators:
+            if separator in text:
+                parts = text.split(separator)
+                for part in parts:
+                    if len(current_chunk) + len(part) + len(separator) <= self.chunk_size:
+                        if current_chunk:
+                            current_chunk += separator + part
+                        else:
+                            current_chunk = part
+                    else:
+                        if current_chunk:
+                            chunks.append(current_chunk)
+                        current_chunk = part
+                        
+                        # If single part is too long, split it
+                        while len(current_chunk) > self.chunk_size:
+                            chunks.append(current_chunk[:self.chunk_size])
+                            current_chunk = current_chunk[self.chunk_size - self.chunk_overlap:]
+                
+                if current_chunk:
+                    chunks.append(current_chunk)
                 return chunks
+        
+        # Fallback: simple character-based splitting
+        start = 0
+        while start < len(text):
+            end = start + self.chunk_size
+            chunk = text[start:end]
+            chunks.append(chunk)
+            start = end - self.chunk_overlap
+        
+        return chunks
 
 from openai import OpenAI
 from supabase import create_client
@@ -101,10 +128,7 @@ class UniversalFileProcessor:
                 return self.clean_text(text)
             
             elif file_extension == '.pdf':
-                try:
-                    import PyPDF2
-                except ImportError:
-                    raise ImportError("PyPDF2 library not available. Please install PyPDF2 for PDF processing.")
+                import PyPDF2
                 
                 try:
                     if file_content:
@@ -132,10 +156,7 @@ class UniversalFileProcessor:
                     raise Exception(f"Error processing PDF file: {e}")
             
             elif file_extension in ['.doc', '.docx']:
-                try:
-                    from docx import Document
-                except ImportError:
-                    raise ImportError("python-docx library not available. Please install python-docx for Word document processing.")
+                from docx import Document
                 
                 try:
                     if file_content:
@@ -157,10 +178,7 @@ class UniversalFileProcessor:
                     raise Exception(f"Error processing Word document: {e}")
             
             elif file_extension == '.csv':
-                try:
-                    import pandas as pd
-                except ImportError:
-                    raise ImportError("pandas library not available. Please install pandas for CSV processing.")
+                import pandas as pd
                 
                 try:
                     if file_content:
@@ -219,10 +237,9 @@ class UniversalFileProcessor:
         print(f"Creating chunks from {len(text)} characters of text")
         
         # Initialize text splitter
-        text_splitter = RecursiveCharacterTextSplitter(
+        text_splitter = SimpleTextSplitter(
             chunk_size=800,  # Smaller chunks for better embedding quality
             chunk_overlap=100,
-            length_function=len,
             separators=["\n\n", "\n", ". ", " ", ""]
         )
         
