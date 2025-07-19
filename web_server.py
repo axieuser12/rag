@@ -371,13 +371,40 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
     
+    # Production environment detection
+    is_production = os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("RENDER") or not debug_mode
+    
     # Serve static files in production
-    if not debug_mode and os.path.exists('dist'):
+    if is_production and os.path.exists('dist'):
         from flask import send_from_directory
         
         @app.route('/<path:path>')
         def serve_static(path):
-            return send_from_directory('dist', path)
+            try:
+                return send_from_directory('dist', path)
+            except:
+                # Fallback to index.html for SPA routing
+                return send_from_directory('dist', 'index.html')
+        
+        @app.route('/assets/<path:path>')
+        def serve_assets(path):
+            return send_from_directory('dist/assets', path)
     
     logger.info(f"Starting server on port {port}, debug={debug_mode}")
-    app.run(host="0.0.0.0", port=port, debug=debug_mode)
+    
+    if is_production:
+        # Use gunicorn in production
+        import subprocess
+        import sys
+        cmd = [
+            sys.executable, "-m", "gunicorn", 
+            "web_server:app",
+            "--bind", f"0.0.0.0:{port}",
+            "--workers", "2",
+            "--timeout", "300",
+            "--max-requests", "1000",
+            "--max-requests-jitter", "100"
+        ]
+        subprocess.run(cmd)
+    else:
+        app.run(host="0.0.0.0", port=port, debug=debug_mode)
