@@ -15,11 +15,11 @@ interface CredentialsFormProps {
 }
 
 const CredentialsForm: React.FC<CredentialsFormProps> = ({ 
-  const { t } = useLanguage();
   onSubmit, 
   onClose, 
   initialCredentials 
 }) => {
+  const { t } = useLanguage();
   const [credentials, setCredentials] = useState<Credentials>({
     openai_api_key: initialCredentials?.openai_api_key || '',
     supabase_url: initialCredentials?.supabase_url || '',
