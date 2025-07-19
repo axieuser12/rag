@@ -7,7 +7,6 @@ Scans the project for potential API key leakage and security issues
 import os
 import re
 import glob
-from pathlib import Path
 
 class SecurityValidator:
     def __init__(self):
