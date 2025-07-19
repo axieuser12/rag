@@ -1,5 +1,6 @@
 import React from 'react';
 import { CheckCircle, AlertCircle, FileText, Database, Brain, ExternalLink, Copy } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface ProcessingResult {
   success: boolean;
@@ -21,6 +22,8 @@ interface ResultsDisplayProps {
 }
 
 const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
+  const { t } = useLanguage();
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
   };
@@ -59,7 +62,7 @@ CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents (created_at);`;
           <AlertCircle className="w-6 h-6 text-red-400 mr-3" />
         )}
         <h2 className="text-2xl font-semibold text-white">
-          {result.success ? 'Processing Complete!' : 'Processing Failed'}
+          {result.success ? t('processingComplete') : t('processingFailed')}
         </h2>
       </div>
 
@@ -76,7 +79,7 @@ CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents (created_at);`;
                 <div className="text-2xl font-bold text-white">
                   {result.files_processed || 0}
                 </div>
-                <div className="text-white/70">Files Processed</div>
+                <div className="text-white/70">{t('filesProcessed')}</div>
               </div>
               
               <div className="bg-white/10 rounded-lg p-4 text-center">
@@ -84,7 +87,7 @@ CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents (created_at);`;
                 <div className="text-2xl font-bold text-white">
                   {result.chunks_created || 0}
                 </div>
-                <div className="text-white/70">Chunks Created</div>
+                <div className="text-white/70">{t('chunksCreated')}</div>
               </div>
               
               <div className="bg-white/10 rounded-lg p-4 text-center">
@@ -92,7 +95,7 @@ CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents (created_at);`;
                 <div className="text-2xl font-bold text-white">
                   {result.upload_stats?.successful_uploads || 0}
                 </div>
-                <div className="text-white/70">Uploaded to Supabase</div>
+                <div className="text-white/70">{t('uploadedToSupabase')}</div>
               </div>
             </div>
 

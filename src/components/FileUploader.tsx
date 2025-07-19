@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { UploadCloud, FileText, XCircle } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface FileUploaderProps {
   onFilesSelected: (files: File[]) => void;
@@ -7,12 +8,20 @@ interface FileUploaderProps {
 }
 
 const FileUploader: React.FC<FileUploaderProps> = ({ onFilesSelected, selectedFiles }) => {
+  const { t } = useLanguage();
   const [isDragOver, setIsDragOver] = useState(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const newFiles = Array.from(event.target.files);
-      onFilesSelected(newFiles);
+      // Limit to 5 files and show feedback
+      const limitedFiles = newFiles.slice(0, 5);
+      onFilesSelected(limitedFiles);
+      
+      if (newFiles.length > 5) {
+        // Could add a toast notification here if needed
+        console.log('File limit reached: Only first 5 files selected');
+      }
     }
   };
 
@@ -21,7 +30,14 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFilesSelected, selectedFi
     setIsDragOver(false);
     if (event.dataTransfer.files) {
       const newFiles = Array.from(event.dataTransfer.files);
-      onFilesSelected(newFiles);
+      // Limit to 5 files and show feedback
+      const limitedFiles = newFiles.slice(0, 5);
+      onFilesSelected(limitedFiles);
+      
+      if (newFiles.length > 5) {
+        // Could add a toast notification here if needed
+        console.log('File limit reached: Only first 5 files selected');
+      }
     }
   }, [onFilesSelected]);
 
@@ -57,13 +73,13 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFilesSelected, selectedFi
         }`}
       >
         <UploadCloud className="w-12 h-12 text-white/70 mb-3" />
-        <p className="text-white/80 text-lg font-medium">Drag & drop files here, or click to browse</p>
-        <p className="text-white/60 text-sm mt-1">Supported formats: TXT, PDF, DOC, DOCX, CSV (Max 16MB per file)</p>
+        <p className="text-white/80 text-lg font-medium">{t('dragDropFiles')}</p>
+        <p className="text-white/60 text-sm mt-1">{t('supportedFormats')}</p>
       </div>
 
       {selectedFiles.length > 0 && (
         <div className="mt-6 text-left">
-          <h3 className="text-white font-semibold mb-3">Selected Files:</h3>
+          <h3 className="text-white font-semibold mb-3">{t('selectedFiles')}</h3>
           <ul className="space-y-2">
             {selectedFiles.map((file, index) => (
               <li key={file.name + file.size + index} className="flex items-center justify-between bg-white/10 p-3 rounded-md">
