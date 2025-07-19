@@ -29,5 +29,9 @@ cmds = [
   "npm run build"
 ]
 
+[variables]
+NIXPACKS_PYTHON_VERSION = "3.11"
+]
+
 [start]
 cmd = "export PATH=$HOME/.local/bin:$PATH && python web_server.py"

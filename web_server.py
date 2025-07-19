@@ -434,23 +434,12 @@ if __name__ == "__main__":
     debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
     
     # Production environment detection
-    is_production = os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("RENDER") or not debug_mode
+    is_production = os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("RENDER") or os.environ.get("PORT")
     
     logger.info(f"Starting server on port {port}, debug={debug_mode}")
     
     if is_production:
-        # Use gunicorn in production
-        import subprocess
-        import sys
-        cmd = [
-            sys.executable, "-m", "gunicorn", 
-            "web_server:app",
-            "--bind", f"0.0.0.0:{port}",
-            "--workers", "2",
-            "--timeout", "300",
-            "--max-requests", "1000",
-            "--max-requests-jitter", "100"
-        ]
-        subprocess.run(cmd)
+        # Production mode - let Railway handle with Procfile
+        app.run(host="0.0.0.0", port=port, debug=False)
     else:
         app.run(host="0.0.0.0", port=port, debug=debug_mode)
