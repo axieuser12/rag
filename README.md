@@ -85,11 +85,15 @@ pip install -r requirements.txt
 # Install Node.js dependencies (for frontend)
 npm install
 
-# Build frontend
-npm run build
+# Start both backend and frontend in development
+npm run start:dev
 
-# Start the development server
+# Or start them separately:
+# Terminal 1: Start Python backend
 python web_server.py
+
+# Terminal 2: Start React frontend
+npm run dev
 ```
 
 ### Deployment to Railway

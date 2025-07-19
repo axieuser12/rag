@@ -230,8 +230,8 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
             <h3 className="text-blue-200 font-medium mb-2">Quick Setup Guide:</h3>
             <ol className="text-blue-100 text-sm space-y-1 list-decimal list-inside">
               <li>Create an OpenAI account and generate an API key</li>
-              <li>Create a Supabase project and enable the pgvector extension</li>
-              <li>Run the provided SQL schema to create the documents table</li>
+              <li>Create a Supabase project and enable the pgvector extension in SQL Editor</li>
+              <li>Run the SQL schema from the results page to create the documents table</li>
               <li>Copy your project URL and service role key from Supabase settings</li>
             </ol>
           </div>
