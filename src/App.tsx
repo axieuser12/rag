@@ -1,5 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Upload, FileText, Database, CheckCircle, AlertCircle, Loader2, Brain, Zap, Settings, Key, Shield } from 'lucide-react';
+import { useLanguage } from './hooks/useLanguage';
+import LanguageToggle from './components/LanguageToggle';
 import FileUploader from './components/FileUploader.tsx';
 import ProcessingStatus from './components/ProcessingStatus.tsx';
 import ResultsDisplay from './components/ResultsDisplay.tsx';
@@ -27,6 +29,7 @@ interface Credentials {
 }
 
 function App() {
+  const { t } = useLanguage();
   const [files, setFiles] = useState<File[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<ProcessingResult | null>(null);
@@ -111,6 +114,7 @@ function App() {
 
   return (
     <div className="min-h-screen gradient-bg">
+      <LanguageToggle />
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -119,12 +123,8 @@ function App() {
               <Brain className="w-12 h-12 text-white" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-white mb-4">
-            Public RAG File Processor
-          </h1>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto">
-            Upload your documents and create a searchable knowledge base using your own OpenAI and Supabase credentials
-          </p>
+          <h1 className="text-4xl font-bold text-white mb-4">{t('title')}</h1>
+          <p className="text-xl text-white/80 max-w-2xl mx-auto">{t('subtitle')}</p>
         </div>
 
         {/* Credentials Status */}
@@ -133,7 +133,7 @@ function App() {
             <div className="flex items-center">
               <Shield className="w-5 h-5 text-white mr-3" />
               <span className="text-white">
-                {credentials ? 'Credentials configured ✓' : 'Credentials required'}
+                {credentials ? t('credentialsConfigured') : t('credentialsRequired')}
               </span>
             </div>
             <div className="flex gap-2">
@@ -142,7 +142,7 @@ function App() {
                   onClick={handleClearCredentials}
                   className="px-4 py-2 text-sm border border-white/30 text-white rounded-lg hover:bg-white/10 transition-colors"
                 >
-                  Change Credentials
+                  {t('changeCredentials')}
                 </button>
               )}
               <button
@@ -150,7 +150,7 @@ function App() {
                 className="flex items-center px-4 py-2 text-sm bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors"
               >
                 <Key className="w-4 h-4 mr-2" />
-                {credentials ? 'Update' : 'Setup'} Credentials
+                {credentials ? t('updateCredentials') : t('setupCredentials')} {t('credentialsRequired').split(' ')[0]}
               </button>
             </div>
           </div>
@@ -163,7 +163,7 @@ function App() {
             <div className="glass-effect rounded-2xl p-8">
               <div className="flex items-center mb-6">
                 <Upload className="w-6 h-6 text-white mr-3" />
-                <h2 className="text-2xl font-semibold text-white">Upload Files</h2>
+                <h2 className="text-2xl font-semibold text-white">{t('uploadFiles')}</h2>
               </div>
               
               <FileUploader 
@@ -181,12 +181,12 @@ function App() {
                     {isProcessing ? (
                       <>
                         <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                        Processing...
+                        {t('processing')}
                       </>
                     ) : (
                       <>
                         <Zap className="w-5 h-5 mr-2" />
-                        Process Files
+                        {t('processFiles')}
                       </>
                     )}
                   </button>
@@ -196,7 +196,7 @@ function App() {
                     disabled={isProcessing}
                     className="px-6 py-3 border border-white/30 text-white rounded-lg font-semibold hover:bg-white/10 transition-colors disabled:opacity-50"
                   >
-                    Clear All
+                    {t('clearAll')}
                   </button>
                 </div>
               )}
@@ -204,7 +204,7 @@ function App() {
               {!credentials && files.length > 0 && (
                 <div className="mt-4 p-4 bg-yellow-500/20 border border-yellow-400/30 rounded-lg">
                   <p className="text-yellow-200 text-center">
-                    Please configure your credentials before processing files
+                    {t('credentialsBeforeProcessing')}
                   </p>
                 </div>
               )}
@@ -224,26 +224,26 @@ function App() {
             <div className="grid md:grid-cols-4 gap-6">
               <div className="glass-effect rounded-xl p-6 text-center">
                 <Shield className="w-8 h-8 text-green-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-white mb-2">Secure</h3>
-                <p className="text-white/70">Your credentials are never stored on our servers</p>
+                <h3 className="text-lg font-semibold text-white mb-2">{t('secure')}</h3>
+                <p className="text-white/70">{t('secureDesc')}</p>
               </div>
               
               <div className="glass-effect rounded-xl p-6 text-center">
                 <FileText className="w-8 h-8 text-blue-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-white mb-2">Multiple Formats</h3>
-                <p className="text-white/70">Support for TXT, PDF, Word, and CSV files</p>
+                <h3 className="text-lg font-semibold text-white mb-2">{t('multipleFormats')}</h3>
+                <p className="text-white/70">{t('multipleFormatsDesc')}</p>
               </div>
               
               <div className="glass-effect rounded-xl p-6 text-center">
                 <Database className="w-8 h-8 text-purple-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-white mb-2">Your Database</h3>
-                <p className="text-white/70">Data stored in your own Supabase instance</p>
+                <h3 className="text-lg font-semibold text-white mb-2">{t('yourDatabase')}</h3>
+                <p className="text-white/70">{t('yourDatabaseDesc')}</p>
               </div>
               
               <div className="glass-effect rounded-xl p-6 text-center">
                 <Brain className="w-8 h-8 text-orange-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-white mb-2">AI Powered</h3>
-                <p className="text-white/70">Smart processing with your OpenAI API</p>
+                <h3 className="text-lg font-semibold text-white mb-2">{t('aiPowered')}</h3>
+                <p className="text-white/70">{t('aiPoweredDesc')}</p>
               </div>
             </div>
           </div>

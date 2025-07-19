@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Eye, EyeOff, Key, Database, Brain, Shield, ExternalLink, AlertCircle } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface Credentials {
   openai_api_key: string;
@@ -14,6 +15,7 @@ interface CredentialsFormProps {
 }
 
 const CredentialsForm: React.FC<CredentialsFormProps> = ({ 
+  const { t } = useLanguage();
   onSubmit, 
   onClose, 
   initialCredentials 
@@ -80,7 +82,7 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
             <Key className="w-6 h-6 text-white mr-3" />
-            <h2 className="text-2xl font-semibold text-white">Configure Credentials</h2>
+            <h2 className="text-2xl font-semibold text-white">{t('configureCredentials')}</h2>
           </div>
           <button
             onClick={onClose}
@@ -95,11 +97,8 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
           <div className="flex items-start">
             <Shield className="w-5 h-5 text-green-400 mr-3 mt-0.5" />
             <div>
-              <p className="text-green-200 font-medium">Your credentials are secure</p>
-              <p className="text-green-100 text-sm mt-1">
-                Credentials are only used for this session and are never stored on our servers. 
-                They are sent directly to your own OpenAI and Supabase services.
-              </p>
+              <p className="text-green-200 font-medium">{t('credentialsSecure')}</p>
+              <p className="text-green-100 text-sm mt-1">{t('credentialsNotStored')}</p>
             </div>
           </div>
         </div>
@@ -109,7 +108,7 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
           <div>
             <label className="flex items-center text-white font-medium mb-2">
               <Brain className="w-4 h-4 mr-2" />
-              OpenAI API Key
+              {t('openaiApiKey')}
               <a
                 href="https://platform.openai.com/api-keys"
                 target="_blank"
@@ -144,7 +143,7 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
               </p>
             )}
             <p className="text-white/60 text-sm mt-1">
-              Get your API key from OpenAI Platform. Used for generating embeddings.
+              {t('openaiApiKey')} - {t('usingOpenAI')}
             </p>
           </div>
 
@@ -152,7 +151,7 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
           <div>
             <label className="flex items-center text-white font-medium mb-2">
               <Database className="w-4 h-4 mr-2" />
-              Supabase Project URL
+              {t('supabaseProjectUrl')}
               <a
                 href="https://supabase.com/dashboard"
                 target="_blank"
@@ -178,7 +177,7 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
               </p>
             )}
             <p className="text-white/60 text-sm mt-1">
-              Found in your Supabase project settings. Where your data will be stored.
+              {t('supabaseProjectUrl')} - {t('yourDatabaseDesc')}
             </p>
           </div>
 
@@ -186,7 +185,7 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
           <div>
             <label className="flex items-center text-white font-medium mb-2">
               <Key className="w-4 h-4 mr-2" />
-              Supabase Service Role Key
+              {t('supabaseServiceKey')}
               <a
                 href="https://supabase.com/dashboard"
                 target="_blank"
@@ -221,18 +220,18 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
               </p>
             )}
             <p className="text-white/60 text-sm mt-1">
-              Service role key from your Supabase project API settings. Required for database operations.
+              {t('supabaseServiceKey')} - {t('storingData')}
             </p>
           </div>
 
           {/* Setup Instructions */}
           <div className="p-4 bg-blue-500/20 border border-blue-400/30 rounded-lg">
-            <h3 className="text-blue-200 font-medium mb-2">Quick Setup Guide:</h3>
+            <h3 className="text-blue-200 font-medium mb-2">{t('quickSetupGuide')}</h3>
             <ol className="text-blue-100 text-sm space-y-1 list-decimal list-inside">
-              <li>Create an OpenAI account and generate an API key</li>
-              <li>Create a Supabase project and enable the pgvector extension in SQL Editor</li>
-              <li>Run the SQL schema from the results page to create the documents table</li>
-              <li>Copy your project URL and service role key from Supabase settings</li>
+              <li>{t('setupStep1')}</li>
+              <li>{t('setupStep2')}</li>
+              <li>{t('setupStep3')}</li>
+              <li>{t('setupStep4')}</li>
             </ol>
           </div>
 
@@ -242,14 +241,14 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
               type="submit"
               className="flex-1 bg-white text-purple-600 py-3 px-6 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
             >
-              Save Credentials
+              {t('saveCredentials')}
             </button>
             <button
               type="button"
               onClick={onClose}
               className="px-6 py-3 border border-white/30 text-white rounded-lg font-semibold hover:bg-white/10 transition-colors"
             >
-              Cancel
+              {t('cancel')}
             </button>
           </div>
         </form>
