@@ -54,7 +54,7 @@ def main():
         backend_thread.start()
         
         # Give backend time to start
-        time.sleep(2)
+        time.sleep(5)
         
         # Start frontend (this will block)
         start_frontend()

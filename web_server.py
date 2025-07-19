@@ -174,6 +174,11 @@ def health_check():
         "environment": os.environ.get("RAILWAY_ENVIRONMENT", "development")
     })
 
+@app.route('/api/health', methods=['GET'])
+def api_health_check():
+    """API Health check endpoint"""
+    return health_check()
+
 @app.route('/', methods=['GET'])
 def index():
     """Serve the main page"""
@@ -330,6 +335,10 @@ def process_files():
             "error": str(e)
         }), 500
 
+@app.route('/api/process-files', methods=['POST'])
+def api_process_files():
+    """API endpoint for file upload and processing"""
+    return process_files()
 def _process_files_internal():
     """Internal file processing logic"""
     try:
@@ -434,23 +443,12 @@ if __name__ == "__main__":
     debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
     
     # Production environment detection
-    is_production = os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("RENDER") or not debug_mode
+    is_production = os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("RENDER") or os.environ.get("PORT")
     
     logger.info(f"Starting server on port {port}, debug={debug_mode}")
     
     if is_production:
-        # Use gunicorn in production
-        import subprocess
-        import sys
-        cmd = [
-            sys.executable, "-m", "gunicorn", 
-            "web_server:app",
-            "--bind", f"0.0.0.0:{port}",
-            "--workers", "2",
-            "--timeout", "300",
-            "--max-requests", "1000",
-            "--max-requests-jitter", "100"
-        ]
-        subprocess.run(cmd)
+        # Production mode - let Railway handle with Procfile
+        app.run(host="0.0.0.0", port=port, debug=False)
     else:
         app.run(host="0.0.0.0", port=port, debug=debug_mode)

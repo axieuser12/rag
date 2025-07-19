@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Upload, FileText, Database, CheckCircle, AlertCircle, Loader2, Brain, Zap, Settings, Key, Shield } from 'lucide-react';
 import FileUploader from './components/FileUploader.tsx';
 import ProcessingStatus from './components/ProcessingStatus.tsx';
@@ -11,6 +11,13 @@ interface ProcessingResult {
   chunks_created?: number;
   files_processed?: number;
   error?: string;
+  upload_stats?: {
+    successful_uploads: number;
+    failed_uploads: number;
+    embedding_errors?: number;
+    total_chunks: number;
+  };
+  processing_errors?: string[];
 }
 
 interface Credentials {
@@ -26,12 +33,28 @@ function App() {
   const [credentials, setCredentials] = useState<Credentials | null>(null);
   const [showCredentials, setShowCredentials] = useState(false);
 
+  // Load credentials from localStorage on component mount
+  useEffect(() => {
+    const savedCredentials = localStorage.getItem('rag-credentials');
+    if (savedCredentials) {
+      try {
+        const parsed = JSON.parse(savedCredentials);
+        setCredentials(parsed);
+      } catch (error) {
+        console.error('Error parsing saved credentials:', error);
+        localStorage.removeItem('rag-credentials');
+      }
+    }
+  }, []);
+
   const handleFilesSelected = useCallback((selectedFiles: File[]) => {
     setFiles(selectedFiles);
     setResult(null);
   }, []);
 
   const handleCredentialsSubmit = useCallback((creds: Credentials) => {
+    // Save credentials to localStorage
+    localStorage.setItem('rag-credentials', JSON.stringify(creds));
     setCredentials(creds);
     setShowCredentials(false);
   }, []);
@@ -57,7 +80,7 @@ function App() {
       formData.append('supabase_url', credentials.supabase_url);
       formData.append('supabase_service_key', credentials.supabase_service_key);
 
-      const response = await fetch('/api/process-files', {
+      const response = await fetch('/process-files', {
         method: 'POST',
         body: formData,
       });
@@ -81,6 +104,7 @@ function App() {
   };
 
   const handleClearCredentials = () => {
+    localStorage.removeItem('rag-credentials');
     setCredentials(null);
     setShowCredentials(true);
   };
