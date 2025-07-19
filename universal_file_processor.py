@@ -76,7 +76,16 @@ class UniversalFileProcessor:
         """Get Supabase client with user-provided credentials"""
         if not self.supabase_url or not self.supabase_service_key:
             raise ValueError("Supabase credentials not provided")
-        return create_client(self.supabase_url, self.supabase_service_key)
+        
+        # Create client with minimal configuration to avoid proxy issues
+        try:
+            return create_client(
+                supabase_url=self.supabase_url,
+                supabase_key=self.supabase_service_key
+            )
+        except Exception as e:
+            # Fallback for older versions
+            return create_client(self.supabase_url, self.supabase_service_key)
     
     def clean_text(self, text: str) -> str:
         """Clean and normalize text content"""
