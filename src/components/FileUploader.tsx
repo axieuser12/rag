@@ -14,7 +14,14 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFilesSelected, selectedFi
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const newFiles = Array.from(event.target.files);
-      onFilesSelected(newFiles);
+      // Limit to 5 files and show feedback
+      const limitedFiles = newFiles.slice(0, 5);
+      onFilesSelected(limitedFiles);
+      
+      if (newFiles.length > 5) {
+        // Could add a toast notification here if needed
+        console.log('File limit reached: Only first 5 files selected');
+      }
     }
   };
 
@@ -23,7 +30,14 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFilesSelected, selectedFi
     setIsDragOver(false);
     if (event.dataTransfer.files) {
       const newFiles = Array.from(event.dataTransfer.files);
-      onFilesSelected(newFiles);
+      // Limit to 5 files and show feedback
+      const limitedFiles = newFiles.slice(0, 5);
+      onFilesSelected(limitedFiles);
+      
+      if (newFiles.length > 5) {
+        // Could add a toast notification here if needed
+        console.log('File limit reached: Only first 5 files selected');
+      }
     }
   }, [onFilesSelected]);
 

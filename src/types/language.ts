@@ -18,7 +18,7 @@ export interface Translations {
 export const translations: Translations = {
   sv: {
     // Header
-    title: 'Offentlig RAG Filbehandlare',
+    title: 'Axie Studio RAG Filbehandlare',
     subtitle: 'Ladda upp dina dokument och skapa en sökbar kunskapsbas med dina egna OpenAI och Supabase-uppgifter',
     
     // Credentials
@@ -36,6 +36,8 @@ export const translations: Translations = {
     processFiles: 'Bearbeta filer',
     processing: 'Bearbetar...',
     clearAll: 'Rensa alla',
+    fileLimitReached: 'Maxgräns nådd (5 filer)',
+    fileLimitWarning: 'Du kan bearbeta maximalt 5 filer åt gången',
     
     // Processing Status
     processingFiles: 'Bearbetar filer',
@@ -87,7 +89,7 @@ export const translations: Translations = {
   },
   en: {
     // Header
-    title: 'Public RAG File Processor',
+    title: 'Axie Studio RAG File Processor',
     subtitle: 'Upload your documents and create a searchable knowledge base using your own OpenAI and Supabase credentials',
     
     // Credentials
@@ -105,6 +107,8 @@ export const translations: Translations = {
     processFiles: 'Process Files',
     processing: 'Processing...',
     clearAll: 'Clear All',
+    fileLimitReached: 'Limit Reached (5 files)',
+    fileLimitWarning: 'You can process a maximum of 5 files at once',
     
     // Processing Status
     processingFiles: 'Processing Files',

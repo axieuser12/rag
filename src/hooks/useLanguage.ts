@@ -16,7 +16,7 @@ export const useLanguage = () => {
     document.documentElement.lang = currentLanguage;
     
     // Update document title based on language
-    const title = currentLanguage === 'sv' ? 'RAG Filbehandlare' : 'RAG File Processor';
+    const title = currentLanguage === 'sv' ? 'Axie Studio RAG Filbehandlare' : 'Axie Studio RAG File Processor';
     document.title = title;
   }, [currentLanguage]);
 

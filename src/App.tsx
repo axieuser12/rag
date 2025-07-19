@@ -51,7 +51,9 @@ function App() {
   }, []);
 
   const handleFilesSelected = useCallback((selectedFiles: File[]) => {
-    setFiles(selectedFiles);
+    // Limit to 5 files maximum
+    const limitedFiles = selectedFiles.slice(0, 5);
+    setFiles(limitedFiles);
     setResult(null);
   }, []);
 
@@ -64,6 +66,7 @@ function App() {
 
   const handleProcess = async () => {
     if (files.length === 0) return;
+    if (files.length > 5) return; // Additional safety check
     if (!credentials) {
       setShowCredentials(true);
       return;
@@ -175,13 +178,18 @@ function App() {
                 <div className="mt-6 flex gap-4">
                   <button
                     onClick={handleProcess}
-                    disabled={isProcessing || !credentials}
+                    disabled={isProcessing || !credentials || files.length > 5}
                     className="flex items-center px-6 py-3 bg-white text-purple-600 rounded-lg font-semibold hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isProcessing ? (
                       <>
                         <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                         {t('processing')}
+                      </>
+                    ) : files.length > 5 ? (
+                      <>
+                        <AlertCircle className="w-5 h-5 mr-2" />
+                        {t('fileLimitReached')}
                       </>
                     ) : (
                       <>
@@ -198,6 +206,15 @@ function App() {
                   >
                     {t('clearAll')}
                   </button>
+                </div>
+              )}
+
+              {files.length > 5 && (
+                <div className="mt-4 p-4 bg-orange-500/20 border border-orange-400/30 rounded-lg">
+                  <p className="text-orange-200 text-center flex items-center justify-center">
+                    <AlertCircle className="w-5 h-5 mr-2" />
+                    {t('fileLimitWarning')}
+                  </p>
                 </div>
               )}
 
