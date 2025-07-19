@@ -5,7 +5,28 @@ import tiktoken
 import chardet
 from pathlib import Path
 from typing import List, Dict, Any
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+try:
+    from langchain.text_splitter import RecursiveCharacterTextSplitter
+except ImportError:
+    try:
+        from langchain_text_splitters import RecursiveCharacterTextSplitter
+    except ImportError:
+        # Fallback text splitter if langchain is not available
+        class RecursiveCharacterTextSplitter:
+            def __init__(self, chunk_size=800, chunk_overlap=100, **kwargs):
+                self.chunk_size = chunk_size
+                self.chunk_overlap = chunk_overlap
+            
+            def split_text(self, text):
+                chunks = []
+                start = 0
+                while start < len(text):
+                    end = start + self.chunk_size
+                    chunk = text[start:end]
+                    chunks.append(chunk)
+                    start = end - self.chunk_overlap
+                return chunks
+
 from openai import OpenAI
 from supabase import create_client
 
@@ -48,15 +69,19 @@ class UniversalFileProcessor:
         """Extract text from various file formats"""
         file_extension = Path(file_path).suffix.lower()
         
+        print(f"Processing file: {file_path} with extension: {file_extension}")
+        
         try:
             if file_extension == '.txt':
                 if file_content:
                     # Detect encoding
                     detected = chardet.detect(file_content)
                     encoding = detected.get('encoding', 'utf-8') if detected else 'utf-8'
+                    print(f"Detected encoding: {encoding}")
                     try:
                         text = file_content.decode(encoding)
                     except (UnicodeDecodeError, LookupError):
+                        print("Fallback to UTF-8 with error handling")
                         text = file_content.decode('utf-8', errors='ignore')
                 else:
                     # Detect encoding for file
@@ -71,13 +96,15 @@ class UniversalFileProcessor:
                     except (UnicodeDecodeError, LookupError):
                         with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
                             text = file.read()
+                
+                print(f"Extracted {len(text)} characters from TXT file")
                 return self.clean_text(text)
             
             elif file_extension == '.pdf':
                 try:
                     import PyPDF2
                 except ImportError:
-                    raise ImportError("PyPDF2 library not available. PDF processing is not supported in this deployment.")
+                    raise ImportError("PyPDF2 library not available. Please install PyPDF2 for PDF processing.")
                 
                 try:
                     if file_content:
@@ -99,6 +126,7 @@ class UniversalFileProcessor:
                             continue
                     
                     text = "\n\n".join(text_parts)
+                    print(f"Extracted {len(text)} characters from PDF file")
                     return self.clean_text(text)
                 except Exception as e:
                     raise Exception(f"Error processing PDF file: {e}")
@@ -107,7 +135,7 @@ class UniversalFileProcessor:
                 try:
                     from docx import Document
                 except ImportError:
-                    raise ImportError("python-docx library not available. Word document processing is not supported in this deployment.")
+                    raise ImportError("python-docx library not available. Please install python-docx for Word document processing.")
                 
                 try:
                     if file_content:
@@ -123,6 +151,7 @@ class UniversalFileProcessor:
                             text_parts.append(paragraph.text)
                     
                     text = "\n\n".join(text_parts)
+                    print(f"Extracted {len(text)} characters from Word document")
                     return self.clean_text(text)
                 except Exception as e:
                     raise Exception(f"Error processing Word document: {e}")
@@ -131,7 +160,7 @@ class UniversalFileProcessor:
                 try:
                     import pandas as pd
                 except ImportError:
-                    raise ImportError("pandas library not available. CSV processing is not supported in this deployment.")
+                    raise ImportError("pandas library not available. Please install pandas for CSV processing.")
                 
                 try:
                     if file_content:
@@ -159,6 +188,7 @@ class UniversalFileProcessor:
                             text_parts.append(row_text)
                     
                     text = "\n".join(text_parts)
+                    print(f"Extracted {len(text)} characters from CSV file")
                     return self.clean_text(text)
                 except Exception as e:
                     raise Exception(f"Error processing CSV file: {e}")
@@ -167,6 +197,7 @@ class UniversalFileProcessor:
                 raise ValueError(f"Unsupported file format: {file_extension}")
                 
         except Exception as e:
+            print(f"Error in extract_text_from_file: {e}")
             raise Exception(f"Error extracting text from {Path(file_path).name}: {e}")
     
     def count_tokens(self, text: str, model: str = "gpt-3.5-turbo") -> int:
@@ -182,7 +213,10 @@ class UniversalFileProcessor:
     def create_chunks(self, text: str, source: str, title: str = None) -> List[Dict[str, Any]]:
         """Create chunks from text with metadata"""
         if not text.strip():
+            print("Warning: Empty text provided for chunking")
             return []
+        
+        print(f"Creating chunks from {len(text)} characters of text")
         
         # Initialize text splitter
         text_splitter = RecursiveCharacterTextSplitter(
@@ -194,6 +228,7 @@ class UniversalFileProcessor:
         
         # Split text into chunks
         chunks = text_splitter.split_text(text)
+        print(f"Text splitter created {len(chunks)} raw chunks")
         
         # Create chunk objects with metadata
         chunk_objects = []
@@ -219,6 +254,7 @@ class UniversalFileProcessor:
                 }
                 chunk_objects.append(chunk_obj)
         
+        print(f"Created {len(chunk_objects)} valid chunk objects")
         return chunk_objects
     
     def get_embedding(self, text: str) -> List[float]:

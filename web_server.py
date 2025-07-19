@@ -80,6 +80,8 @@ def internal_error(e):
 def process_files_with_credentials(temp_dir: str, credentials: Dict[str, str]) -> Dict[str, Any]:
     """Process files using user-provided credentials"""
     try:
+        logger.info("Starting file processing with user credentials")
+        
         # Create processor instance
         processor = UniversalFileProcessor()
         
@@ -88,39 +90,55 @@ def process_files_with_credentials(temp_dir: str, credentials: Dict[str, str]) -
         processor.supabase_url = credentials['supabase_url']
         processor.supabase_service_key = credentials['supabase_service_key']
         
+        logger.info("Processor configured with user credentials")
+        
         all_chunks = []
         files_processed = 0
         processing_errors = []
         
         if not os.path.exists(temp_dir):
+            logger.error(f"Temp directory does not exist: {temp_dir}")
             return {
                 "success": False,
                 "message": "Upload directory not found",
                 "error": f"Directory {temp_dir} does not exist"
             }
         
+        uploaded_files = os.listdir(temp_dir)
+        logger.info(f"Files in temp directory: {uploaded_files}")
+        
         # Process all files in the directory
-        for filename in os.listdir(temp_dir):
+        for filename in uploaded_files:
             file_path = os.path.join(temp_dir, filename)
             
             if os.path.isfile(file_path):
                 file_extension = Path(file_path).suffix.lower()
+                logger.info(f"Processing file: {filename} with extension: {file_extension}")
                 
                 if file_extension in processor.supported_extensions:
                     try:
+                        logger.info(f"Starting processing of {filename}")
                         file_chunks = processor.process_file(file_path)
                         all_chunks.extend(file_chunks)
                         files_processed += 1
                         logger.info(f"Processed {filename}: {len(file_chunks)} chunks")
                     except Exception as e:
                         logger.error(f"Error processing {filename}: {e}")
+                        processing_errors.append(f"Error processing {filename}: {str(e)}")
+                else:
+                    logger.warning(f"Skipping {filename} - unsupported extension: {file_extension}")
+                    processing_errors.append(f"Skipped {filename} - unsupported file type")
         
         if not all_chunks:
+            logger.warning("No chunks were created from any files")
             return {
                 "success": False,
                 "message": "No content could be extracted from the uploaded files",
-                "files_processed": files_processed
+                "files_processed": files_processed,
+                "processing_errors": processing_errors
             }
+        
+        logger.info(f"Created {len(all_chunks)} total chunks, uploading to Supabase")
         
         # Upload to user's Supabase
         upload_result = processor.upload_to_supabase(all_chunks)
@@ -322,9 +340,12 @@ def _process_files_internal():
             'supabase_service_key': request.form.get('supabase_service_key', '')
         }
         
+        logger.info("Processing request with credentials provided")
+        
         # Validate credentials
         credential_errors = validate_credentials(credentials)
         if credential_errors:
+            logger.warning(f"Credential validation failed: {credential_errors}")
             return jsonify({
                 "success": False,
                 "message": "Invalid credentials provided",
@@ -338,6 +359,8 @@ def _process_files_internal():
                 "success": False,
                 "message": "No files were uploaded"
             }), 400
+        
+        logger.info(f"Request files: {list(request.files.keys())}")
         
         # Create temporary directory for uploaded files
         temp_dir = tempfile.mkdtemp(prefix="rag_upload_")
@@ -356,11 +379,14 @@ def _process_files_internal():
                         file.save(file_path)
                         files_saved += 1
                         logger.info(f"Saved file: {filename}")
+                    elif file and file.filename:
+                        logger.warning(f"File {file.filename} not allowed (extension not supported)")
             
             if files_saved == 0:
+                logger.warning("No valid files were saved")
                 return jsonify({
                     "success": False,
-                    "message": "No valid files were uploaded"
+                    "message": "No valid files were uploaded. Supported formats: TXT, PDF, DOC, DOCX, CSV"
                 }), 400
             
             logger.info(f"Processing {files_saved} files with user credentials")
@@ -380,6 +406,7 @@ def _process_files_internal():
             "success": False,
             "message": "Error processing files",
             "error": str(e)
+        })
 
 # Static file serving for production
 @app.route('/assets/<path:path>')
