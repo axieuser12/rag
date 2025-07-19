@@ -1,186 +1,198 @@
-# 🧠 RAG File Processor
+# 🧠 Public RAG File Processor
 
-A secure, production-ready RAG (Retrieval-Augmented Generation) system that processes documents and creates a searchable knowledge base using OpenAI embeddings and Supabase vector storage.
+A secure, multi-user RAG (Retrieval-Augmented Generation) system where users provide their own OpenAI and Supabase credentials to process documents and create searchable knowledge bases.
 
 ## 🔒 Security Features
 
-- **No API Key Leakage**: All sensitive credentials are stored in environment variables
-- **Environment-based Configuration**: Uses `.env` file for all configuration
-- **Security Validation**: Built-in security scanner to detect potential API key exposure
-- **Production Ready**: Secure deployment configuration
+- **Zero Credential Storage**: User credentials are never stored on our servers
+- **Session-Only Processing**: Credentials are used only for the current session
+- **Direct API Communication**: Your data goes directly to your own OpenAI and Supabase services
+- **No Data Retention**: No user data is retained after processing
+- **Open Source**: Full transparency of how your credentials are handled
 
-## 🚀 Quick Start
+## 🚀 For Users
 
-### 1. Environment Setup
+### Quick Start
+
+1. **Get Your Credentials**:
+   - OpenAI API Key: [Get from OpenAI Platform](https://platform.openai.com/api-keys)
+   - Supabase Project: [Create at Supabase](https://supabase.com/dashboard)
+
+2. **Setup Your Supabase Database**:
+   ```sql
+   -- Enable pgvector extension
+   CREATE EXTENSION IF NOT EXISTS vector;
+   
+   -- Create documents table
+   CREATE TABLE IF NOT EXISTS documents (
+       id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+       content text NOT NULL,
+       embedding vector(1536) NOT NULL,
+       source text,
+       metadata jsonb
+   );
+   
+   -- Create index for fast similarity search
+   CREATE INDEX IF NOT EXISTS idx_documents_embedding
+   ON documents
+   USING ivfflat (embedding vector_cosine_ops)
+   WITH (lists = 100);
+   ```
+
+3. **Use the System**:
+   - Visit the web interface
+   - Enter your credentials (they're never stored)
+   - Upload your documents
+   - Your RAG system is ready!
+
+### Supported File Types
+- **Text Files**: .txt
+- **PDFs**: .pdf
+- **Word Documents**: .doc, .docx
+- **Spreadsheets**: .csv
+
+## 🛠️ For Developers
+
+### Local Development
 
 ```bash
-# Copy the example environment file
-cp .env.example .env
+# Clone the repository
+git clone <your-repo>
+cd rag-file-processor
 
-# Edit .env with your actual credentials
-nano .env
-```
-
-### 2. Install Dependencies
-
-```bash
+# Install dependencies
 pip install -r requirements.txt
-```
 
-### 3. Validate Security
-
-```bash
-# Run security scan to ensure no API keys are exposed
-python security_validator.py
-```
-
-### 4. Process Files
-
-```bash
-# Process all txt files in the Txt File directory
-python run_comprehensive_processing.py
-
-# Or start the web server for file uploads
+# Start the development server
 python web_server.py
 ```
 
-## 📁 Project Structure
+### Deployment to Railway
+
+1. **Connect Your Repository**:
+   - Link your GitHub repository to Railway
+   - Railway will auto-detect the Python app
+
+2. **Environment Variables** (Optional):
+   - No environment variables needed for basic deployment
+   - The system uses user-provided credentials
+
+3. **Deploy**:
+   - Railway will automatically deploy your app
+   - Users can access it via the provided URL
+
+### Project Structure
 
 ```
-├── .env                          # Environment variables (DO NOT COMMIT)
-├── .env.example                  # Example environment file
-├── .gitignore                    # Git ignore file (includes .env)
+├── src/                          # React frontend
+│   ├── components/
+│   │   ├── CredentialsForm.tsx   # Secure credential input
+│   │   ├── FileUploader.tsx      # File upload interface
+│   │   └── ...
+│   └── App.tsx                   # Main application
+├── web_server.py                 # Flask backend
+├── universal_file_processor.py   # File processing logic
 ├── security_validator.py         # Security scanner
-├── web_server.py                 # Web interface for file uploads
-├── universal_file_processor.py   # Universal file processing
-├── improved_chunk_processor.py   # Advanced chunking strategies
-├── enhanced_query_system.py      # Query and search system
-└── Embedded_Rag_Vectorstore_Supabase/
-    ├── prepare_rag_chunks.py     # Basic chunking
-    ├── ingest_to_supabase.py     # Supabase ingestion
-    └── rag_query_example.py      # Query examples
+└── requirements.txt              # Python dependencies
 ```
 
-## 🔧 Configuration
+## 🔧 Architecture
 
-All configuration is done through environment variables in the `.env` file:
+### Security Model
+1. **Frontend**: Collects user credentials securely
+2. **Backend**: Receives credentials in request, never stores them
+3. **Processing**: Uses credentials to connect to user's services
+4. **Cleanup**: Credentials are discarded after processing
 
-```env
-# OpenAI Configuration
-OPENAI_API_KEY=your_openai_api_key_here
-
-# Supabase Configuration
-SUPABASE_URL=your_supabase_url_here
-SUPABASE_SERVICE_KEY=your_supabase_service_key_here
-
-# Optional: Direct database connection
-SUPABASE_DB_HOST=your_db_host_here
-SUPABASE_DB_PORT=5432
-SUPABASE_DB_NAME=postgres
-SUPABASE_DB_USER=postgres
-SUPABASE_DB_PASSWORD=your_db_password_here
+### Data Flow
+```
+User Credentials → Temporary Session → User's OpenAI API → User's Supabase DB
+                                   ↓
+                              No Storage on Our Servers
 ```
 
 ## 🛡️ Security Best Practices
 
-1. **Never commit `.env` files** - They're automatically ignored by git
-2. **Use environment variables** - All scripts read from environment variables only
-3. **Run security scans** - Use `python security_validator.py` regularly
-4. **Rotate API keys** - Regularly update your API keys
-5. **Limit permissions** - Use service role keys with minimal required permissions
+### For Users
+- **Use API Keys with Minimal Permissions**: Create dedicated API keys for this service
+- **Monitor Usage**: Check your OpenAI and Supabase usage regularly
+- **Rotate Keys**: Regularly rotate your API keys
+- **Dedicated Project**: Consider using a dedicated Supabase project
+
+### For Developers
+- **Never Log Credentials**: Ensure credentials are never logged
+- **Memory Cleanup**: Clear credentials from memory after use
+- **HTTPS Only**: Always use HTTPS in production
+- **Input Validation**: Validate all user inputs
 
 ## 📊 Features
 
-### File Processing
-- **Multiple Formats**: TXT, PDF, Word documents, CSV files
-- **Smart Chunking**: Multiple chunking strategies for comprehensive coverage
-- **Content Extraction**: Automatic extraction of key information (contacts, pricing, etc.)
+### Multi-Format Support
+- Intelligent text extraction from various file formats
+- Automatic content chunking for optimal embedding
+- Metadata preservation for enhanced search
 
-### Vector Storage
-- **Supabase Integration**: Secure vector storage with PostgreSQL + pgvector
-- **OpenAI Embeddings**: High-quality text embeddings using `text-embedding-3-small`
-- **Metadata Support**: Rich metadata for enhanced search and filtering
+### Smart Processing
+- **Multiple Chunking Strategies**: Ensures comprehensive coverage
+- **Key Information Extraction**: Automatically identifies contacts, pricing, etc.
+- **Content Categorization**: Organizes chunks by type for better retrieval
 
-### Web Interface
-- **Drag & Drop Upload**: Modern web interface for file uploads
-- **Real-time Processing**: Live status updates during processing
-- **Responsive Design**: Works on desktop and mobile devices
+### User Experience
+- **Modern Web Interface**: Drag & drop file uploads
+- **Real-time Processing**: Live status updates
+- **Responsive Design**: Works on all devices
+- **Secure Credential Handling**: User-friendly credential input with validation
 
-### Query System
-- **Semantic Search**: Vector similarity search for relevant content
-- **Category Filtering**: Search by content type (pricing, contact, etc.)
-- **Comprehensive Results**: Multiple search strategies for best coverage
+## 🚀 Deployment Options
 
-## 🚀 Deployment
+### Railway (Recommended)
+- Automatic deployment from GitHub
+- Built-in HTTPS
+- Global CDN
+- Easy scaling
 
-### Local Development
-```bash
-python web_server.py
-```
-
-### Production Deployment
-The project includes configuration for Railway, Heroku, and other platforms:
-
-1. Set environment variables in your deployment platform
-2. Deploy using the included `Procfile` and `railway.json`
-3. The web server will automatically start on the assigned port
-
-## 🔍 Security Validation
-
-Run the security validator to ensure no API keys are exposed:
-
-```bash
-python security_validator.py
-```
-
-This will scan all project files and report any potential security issues.
-
-## 📝 Usage Examples
-
-### Process Files via Web Interface
-1. Start the web server: `python web_server.py`
-2. Open `http://localhost:8000` in your browser
-3. Upload files using the drag & drop interface
-4. Files are automatically processed and stored in Supabase
-
-### Process Files via Command Line
-```bash
-# Process all txt files
-python run_comprehensive_processing.py
-
-# Process specific file types
-python universal_file_processor.py
-```
-
-### Query the Knowledge Base
-```bash
-# Interactive query system
-python enhanced_query_system.py
-
-# Basic query example
-python Embedded_Rag_Vectorstore_Supabase/rag_query_example.py
-```
+### Other Platforms
+- **Heroku**: Use the included `Procfile`
+- **DigitalOcean App Platform**: Works out of the box
+- **Google Cloud Run**: Container-ready
+- **AWS Elastic Beanstalk**: Python application support
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Run security validation: `python security_validator.py`
-4. Ensure all API keys are in environment variables
+4. Ensure no credentials are hardcoded
 5. Submit a pull request
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## ⚠️ Important Security Notes
+## ⚠️ Important Notes
 
-- **Never commit API keys** to version control
-- **Always use environment variables** for sensitive configuration
-- **Run security scans** before deploying
-- **Rotate API keys** regularly
-- **Use minimal permissions** for service accounts
+### For Users
+- Your credentials are your responsibility
+- Monitor your API usage and costs
+- This service processes your data using your own infrastructure
+- No data is stored on our servers
+
+### For Developers
+- Never store user credentials
+- Always validate inputs
+- Implement proper error handling
+- Follow security best practices
 
 ---
 
-**Built with security in mind** 🔒
+**Built for the community, secured by design** 🔒
+
+### Support
+
+- 📧 Issues: Use GitHub Issues
+- 💬 Discussions: Use GitHub Discussions
+- 🔒 Security: Report security issues privately
+
+---
+
+**Your data, your infrastructure, your control** ✨
