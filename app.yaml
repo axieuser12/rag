@@ -1,0 +1,27 @@
+# Google App Engine configuration
+runtime: python311
+
+env_variables:
+  FLASK_ENV: production
+
+handlers:
+  # Serve static files from the React build
+  - url: /static
+    static_dir: dist/assets
+    secure: always
+
+  # Serve the main React app
+  - url: /
+    static_files: dist/index.html
+    upload: dist/index.html
+    secure: always
+
+  # API routes
+  - url: /.*
+    script: auto
+    secure: always
+
+automatic_scaling:
+  min_instances: 0
+  max_instances: 10
+  target_cpu_utilization: 0.6

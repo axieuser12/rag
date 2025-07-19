@@ -6,10 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:production": "vite build --mode production",
     "preview": "vite preview",
     "start:backend": "python web_server.py",
     "start:dev": "concurrently \"npm run start:backend\" \"npm run dev\"",
-    "start": "python web_server.py"
+    "start": "python web_server.py",
+    "postbuild": "echo 'Build completed successfully'"
   },
   "dependencies": {
     "react": "^18.3.1",
