@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: rag-file-processor
+    env: python
+    buildCommand: |
+      pip install -r requirements.txt
+      npm ci
+      npm run build
+    startCommand: gunicorn web_server:app --bind 0.0.0.0:$PORT --workers 2 --timeout 300
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+    disk:
+      name: rag-processor-disk
+      mountPath: /tmp
+      sizeGB: 1

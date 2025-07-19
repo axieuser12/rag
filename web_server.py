@@ -158,6 +158,11 @@ def health_check():
 @app.route('/', methods=['GET'])
 def index():
     """Serve the main page"""
+    # In production, serve the built React app
+    if os.path.exists('dist/index.html'):
+        return app.send_static_file('dist/index.html')
+    
+    # Fallback HTML for development
     return """
     <!DOCTYPE html>
     <html>
@@ -365,6 +370,14 @@ def process_files():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
+    
+    # Serve static files in production
+    if not debug_mode and os.path.exists('dist'):
+        from flask import send_from_directory
+        
+        @app.route('/<path:path>')
+        def serve_static(path):
+            return send_from_directory('dist', path)
     
     logger.info(f"Starting server on port {port}, debug={debug_mode}")
     app.run(host="0.0.0.0", port=port, debug=debug_mode)

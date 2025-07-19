@@ -1,0 +1,27 @@
+{
+  "builds": [
+    {
+      "src": "web_server.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "web_server.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/dist/$1"
+    }
+  ],
+  "functions": {
+    "web_server.py": {
+      "maxDuration": 300
+    }
+  }
+}
