@@ -1,6 +1,6 @@
 # 🧠 Public RAG File Processor
 
-A secure, multi-user RAG (Retrieval-Augmented Generation) system where users provide their own OpenAI and Supabase credentials to process documents and create searchable knowledge bases.
+A secure, production-ready RAG (Retrieval-Augmented Generation) system where users provide their own OpenAI and Supabase credentials to process documents and create searchable knowledge bases.
 
 ## 🔒 Security Features
 
@@ -9,6 +9,12 @@ A secure, multi-user RAG (Retrieval-Augmented Generation) system where users pro
 - **Direct API Communication**: Your data goes directly to your own OpenAI and Supabase services
 - **No Data Retention**: No user data is retained after processing
 - **Open Source**: Full transparency of how your credentials are handled
+
+## 🚀 Live Demo
+
+Deploy to Railway with one click:
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/your-template-id)
 
 ## 🚀 For Users
 
@@ -29,7 +35,8 @@ A secure, multi-user RAG (Retrieval-Augmented Generation) system where users pro
        content text NOT NULL,
        embedding vector(1536) NOT NULL,
        source text,
-       metadata jsonb
+       metadata jsonb,
+       created_at timestamptz DEFAULT now()
    );
    
    -- Create index for fast similarity search
@@ -37,6 +44,10 @@ A secure, multi-user RAG (Retrieval-Augmented Generation) system where users pro
    ON documents
    USING ivfflat (embedding vector_cosine_ops)
    WITH (lists = 100);
+   
+   -- Additional indexes for performance
+   CREATE INDEX IF NOT EXISTS idx_documents_source ON documents (source);
+   CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents (created_at);
    ```
 
 3. **Use the System**:
@@ -49,7 +60,15 @@ A secure, multi-user RAG (Retrieval-Augmented Generation) system where users pro
 - **Text Files**: .txt
 - **PDFs**: .pdf
 - **Word Documents**: .doc, .docx
-- **Spreadsheets**: .csv
+- **CSV Files**: .csv
+
+### Features
+- **Smart Text Extraction**: Handles various file formats with error recovery
+- **Intelligent Chunking**: Optimized chunk sizes for better embedding quality
+- **Comprehensive Processing**: Multiple chunking strategies for maximum coverage
+- **Real-time Progress**: Live updates during processing
+- **Error Handling**: Detailed error reporting and troubleshooting tips
+- **Production Ready**: Optimized for Railway deployment with proper logging
 
 ## 🛠️ For Developers
 
@@ -60,8 +79,14 @@ A secure, multi-user RAG (Retrieval-Augmented Generation) system where users pro
 git clone <your-repo>
 cd rag-file-processor
 
-# Install dependencies
+# Install Python dependencies
 pip install -r requirements.txt
+
+# Install Node.js dependencies (for frontend)
+npm install
+
+# Build frontend
+npm run build
 
 # Start the development server
 python web_server.py
@@ -74,12 +99,23 @@ python web_server.py
    - Railway will auto-detect the Python app
 
 2. **Environment Variables** (Optional):
-   - No environment variables needed for basic deployment
+   - `FLASK_DEBUG=false` (for production)
+   - `PORT` (automatically set by Railway)
    - The system uses user-provided credentials
 
 3. **Deploy**:
    - Railway will automatically deploy your app
    - Users can access it via the provided URL
+
+### Production Configuration
+
+The app is configured for production with:
+- **Gunicorn WSGI server** with optimized worker settings
+- **Comprehensive error handling** and logging
+- **File upload limits** and security validation
+- **Health check endpoints** for monitoring
+- **Automatic cleanup** of temporary files
+- **Rate limiting** and timeout protection
 
 ### Project Structure
 
@@ -88,12 +124,16 @@ python web_server.py
 │   ├── components/
 │   │   ├── CredentialsForm.tsx   # Secure credential input
 │   │   ├── FileUploader.tsx      # File upload interface
+│   │   ├── ProcessingStatus.tsx  # Real-time status updates
+│   │   ├── ResultsDisplay.tsx    # Results and statistics
 │   │   └── ...
 │   └── App.tsx                   # Main application
 ├── web_server.py                 # Flask backend
 ├── universal_file_processor.py   # File processing logic
-├── security_validator.py         # Security scanner
-└── requirements.txt              # Python dependencies
+├── requirements.txt              # Python dependencies
+├── Procfile                      # Railway deployment config
+├── railway.json                  # Railway settings
+└── runtime.txt                   # Python version
 ```
 
 ## 🔧 Architecture
@@ -111,6 +151,13 @@ User Credentials → Temporary Session → User's OpenAI API → User's Supabase
                               No Storage on Our Servers
 ```
 
+### Performance Optimizations
+- **Chunking Strategy**: Optimized chunk sizes (800 chars) for better embeddings
+- **Batch Processing**: Efficient file processing with progress tracking
+- **Memory Management**: Automatic cleanup of temporary files
+- **Error Recovery**: Graceful handling of file processing errors
+- **Connection Pooling**: Optimized database connections
+
 ## 🛡️ Security Best Practices
 
 ### For Users
@@ -124,24 +171,30 @@ User Credentials → Temporary Session → User's OpenAI API → User's Supabase
 - **Memory Cleanup**: Clear credentials from memory after use
 - **HTTPS Only**: Always use HTTPS in production
 - **Input Validation**: Validate all user inputs
+- **File Size Limits**: Enforce reasonable file upload limits
+- **Timeout Protection**: Prevent long-running requests from hanging
 
 ## 📊 Features
 
 ### Multi-Format Support
 - Intelligent text extraction from various file formats
-- Automatic content chunking for optimal embedding
+- Optimized content chunking for better embedding quality
 - Metadata preservation for enhanced search
+- Error recovery for corrupted files
 
 ### Smart Processing
-- **Multiple Chunking Strategies**: Ensures comprehensive coverage
-- **Key Information Extraction**: Automatically identifies contacts, pricing, etc.
-- **Content Categorization**: Organizes chunks by type for better retrieval
+- **Intelligent Chunking**: Optimized chunk sizes and overlap
+- **Text Cleaning**: Removes problematic characters and formatting
+- **Progress Tracking**: Real-time processing updates
+- **Batch Upload**: Efficient database operations
 
 ### User Experience
 - **Modern Web Interface**: Drag & drop file uploads
 - **Real-time Processing**: Live status updates
 - **Responsive Design**: Works on all devices
 - **Secure Credential Handling**: User-friendly credential input with validation
+- **Detailed Results**: Comprehensive processing statistics
+- **Error Guidance**: Helpful troubleshooting tips
 
 ## 🚀 Deployment Options
 
@@ -150,6 +203,7 @@ User Credentials → Temporary Session → User's OpenAI API → User's Supabase
 - Built-in HTTPS
 - Global CDN
 - Easy scaling
+- Health check monitoring
 
 ### Other Platforms
 - **Heroku**: Use the included `Procfile`
@@ -157,13 +211,49 @@ User Credentials → Temporary Session → User's OpenAI API → User's Supabase
 - **Google Cloud Run**: Container-ready
 - **AWS Elastic Beanstalk**: Python application support
 
+## 📈 Monitoring and Maintenance
+
+### Health Checks
+- `/health` endpoint for monitoring
+- Automatic restart on failures
+- Comprehensive logging
+
+### Performance Metrics
+- Processing time tracking
+- Upload success rates
+- Error rate monitoring
+- Resource usage optimization
+
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
-3. Run security validation: `python security_validator.py`
+3. Test your changes locally
 4. Ensure no credentials are hardcoded
 5. Submit a pull request
+
+## 🔧 API Reference
+
+### Endpoints
+
+- `GET /health` - Health check
+- `GET /` - Web interface
+- `POST /process-files` - Upload and process files
+
+### File Processing
+
+```python
+# Example usage
+from universal_file_processor import UniversalFileProcessor
+
+processor = UniversalFileProcessor()
+processor.openai_api_key = "your-key"
+processor.supabase_url = "your-url"
+processor.supabase_service_key = "your-service-key"
+
+chunks = processor.process_file("document.pdf")
+result = processor.upload_to_supabase(chunks)
+```
 
 ## 📄 License
 
@@ -176,23 +266,26 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Monitor your API usage and costs
 - This service processes your data using your own infrastructure
 - No data is stored on our servers
+- File size limit: 16MB per file
+- Supported formats: TXT, PDF, DOC, DOCX, CSV
 
 ### For Developers
 - Never store user credentials
 - Always validate inputs
 - Implement proper error handling
 - Follow security best practices
+- Monitor resource usage in production
+- Implement rate limiting for high-traffic scenarios
 
 ---
 
-**Built for the community, secured by design** 🔒
+**Production-ready RAG processing, secured by design** 🔒
 
 ### Support
 
 - 📧 Issues: Use GitHub Issues
 - 💬 Discussions: Use GitHub Discussions
 - 🔒 Security: Report security issues privately
+- 📖 Documentation: Check the README and code comments
 
 ---
-
-**Your data, your infrastructure, your control** ✨

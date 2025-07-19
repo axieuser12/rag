@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "python web_server.py"
+    "start": "python web_server.py"
   },
   "dependencies": {
     "react": "^18.3.1",
