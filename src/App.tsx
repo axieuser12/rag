@@ -11,6 +11,13 @@ interface ProcessingResult {
   chunks_created?: number;
   files_processed?: number;
   error?: string;
+  upload_stats?: {
+    successful_uploads: number;
+    failed_uploads: number;
+    embedding_errors?: number;
+    total_chunks: number;
+  };
+  processing_errors?: string[];
 }
 
 interface Credentials {
@@ -73,7 +80,7 @@ function App() {
       formData.append('supabase_url', credentials.supabase_url);
       formData.append('supabase_service_key', credentials.supabase_service_key);
 
-      const response = await fetch('/api/process-files', {
+      const response = await fetch('/process-files', {
         method: 'POST',
         body: formData,
       });

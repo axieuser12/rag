@@ -7,8 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start:backend": "python web_server.py",
-    "start:dev": "python start_dev.py",
+    "start:dev": "concurrently \"python web_server.py\" \"npm run dev\"",
     "start": "python web_server.py"
   },
   "dependencies": {
