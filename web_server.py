@@ -9,6 +9,7 @@ import json
 import tempfile
 import shutil
 import logging
+import traceback
 from pathlib import Path
 from typing import Dict, Any
 from flask import Flask, request, jsonify
@@ -17,7 +18,10 @@ from werkzeug.utils import secure_filename
 from universal_file_processor import UniversalFileProcessor
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 # Initialize Flask app
@@ -29,6 +33,7 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'doc', 'docx', 'csv'}
 MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
 
 app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
+app.config['UPLOAD_FOLDER'] = tempfile.gettempdir()
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -54,6 +59,23 @@ def validate_credentials(credentials):
     
     return errors
 
+@app.errorhandler(413)
+def too_large(e):
+    return jsonify({
+        "success": False,
+        "message": "File too large. Maximum size is 16MB.",
+        "error": "File size exceeds limit"
+    }), 413
+
+@app.errorhandler(500)
+def internal_error(e):
+    logger.error(f"Internal server error: {e}")
+    return jsonify({
+        "success": False,
+        "message": "Internal server error occurred",
+        "error": "Please try again later"
+    }), 500
+
 def process_files_with_credentials(temp_dir: str, credentials: Dict[str, str]) -> Dict[str, Any]:
     """Process files using user-provided credentials"""
     try:
@@ -67,6 +89,7 @@ def process_files_with_credentials(temp_dir: str, credentials: Dict[str, str]) -
         
         all_chunks = []
         files_processed = 0
+        processing_errors = []
         
         if not os.path.exists(temp_dir):
             return {
@@ -101,16 +124,21 @@ def process_files_with_credentials(temp_dir: str, credentials: Dict[str, str]) -
         # Upload to user's Supabase
         upload_result = processor.upload_to_supabase(all_chunks)
         
+        success_message = f"Successfully processed {files_processed} files and created {len(all_chunks)} chunks"
+        if processing_errors:
+            success_message += f" (with {len(processing_errors)} file errors)"
+        
         return {
             "success": True,
-            "message": f"Successfully processed {files_processed} files and created {len(all_chunks)} chunks",
+            "message": success_message,
             "files_processed": files_processed,
             "chunks_created": len(all_chunks),
-            "upload_stats": upload_result
+            "upload_stats": upload_result,
+            "processing_errors": processing_errors if processing_errors else None
         }
         
     except Exception as e:
-        logger.error(f"Error in process_files_with_credentials: {e}")
+        logger.error(f"Error in process_files_with_credentials: {e}\n{traceback.format_exc()}")
         return {
             "success": False,
             "message": "Error processing files",
@@ -123,7 +151,8 @@ def health_check():
     return jsonify({
         "status": "healthy", 
         "message": "Public RAG File Processor is running",
-        "version": "1.0.0"
+        "version": "1.0.0",
+        "environment": os.environ.get("RAILWAY_ENVIRONMENT", "development")
     })
 
 @app.route('/', methods=['GET'])
@@ -134,6 +163,7 @@ def index():
     <html>
     <head>
         <title>Public RAG File Processor</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
             body { font-family: Arial, sans-serif; margin: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
             .container { max-width: 800px; margin: 0 auto; text-align: center; }
@@ -142,14 +172,26 @@ def index():
             input[type="text"], input[type="password"] { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 5px; }
             button { background: white; color: #667eea; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
             button:hover { background: #f0f0f0; }
+            button:disabled { opacity: 0.6; cursor: not-allowed; }
             .result { margin: 20px 0; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px; }
             .credentials { background: rgba(255,255,255,0.1); padding: 20px; margin: 20px 0; border-radius: 10px; text-align: left; }
+            .loading { display: none; }
+            .security-notice { background: rgba(0,255,0,0.1); padding: 15px; margin: 20px 0; border-radius: 10px; border: 1px solid rgba(0,255,0,0.3); }
+            @media (max-width: 768px) {
+                body { margin: 20px; }
+                .container { padding: 0 10px; }
+            }
         </style>
     </head>
     <body>
         <div class="container">
             <h1>🧠 Public RAG File Processor</h1>
             <p>Upload your documents using your own OpenAI and Supabase credentials</p>
+            
+            <div class="security-notice">
+                <h4>🔒 Security Notice</h4>
+                <p>Your credentials are processed securely and never stored on our servers. They are used only for this session to connect directly to your own services.</p>
+            </div>
             
             <div class="credentials">
                 <h3>🔐 Your Credentials (Secure)</h3>
@@ -163,7 +205,10 @@ def index():
                 <h3>Upload Files</h3>
                 <input type="file" id="fileInput" multiple accept=".txt,.pdf,.doc,.docx,.csv">
                 <br>
-                <button onclick="uploadFiles()">Process Files</button>
+                <button id="processBtn" onclick="uploadFiles()">Process Files</button>
+                <div id="loading" class="loading">
+                    <p>⏳ Processing files... This may take a few minutes.</p>
+                </div>
             </div>
             
             <div id="result" class="result" style="display:none;"></div>
@@ -176,6 +221,8 @@ def index():
                 const supabaseUrl = document.getElementById('supabaseUrl').value;
                 const supabaseKey = document.getElementById('supabaseKey').value;
                 const resultDiv = document.getElementById('result');
+                const processBtn = document.getElementById('processBtn');
+                const loading = document.getElementById('loading');
                 
                 if (fileInput.files.length === 0) {
                     alert('Please select files to upload');
@@ -197,6 +244,9 @@ def index():
                 formData.append('supabase_url', supabaseUrl);
                 formData.append('supabase_service_key', supabaseKey);
                 
+                // Show loading state
+                processBtn.disabled = true;
+                loading.style.display = 'block';
                 resultDiv.style.display = 'block';
                 resultDiv.innerHTML = '<h3>Processing files...</h3><p>Please wait while we process your files and create embeddings.</p>';
                 
@@ -214,6 +264,8 @@ def index():
                             <p>${result.message}</p>
                             <p>Files processed: ${result.files_processed}</p>
                             <p>Chunks created: ${result.chunks_created}</p>
+                            ${result.upload_stats ? '<p><strong>Successful uploads:</strong> ' + result.upload_stats.successful_uploads + '</p>' : ''}
+                            ${result.processing_errors ? '<p><strong>Warnings:</strong> Some files had processing issues</p>' : ''}
                         `;
                     } else {
                         resultDiv.innerHTML = `
@@ -227,6 +279,10 @@ def index():
                         <h3>❌ Error</h3>
                         <p>Failed to process files: ${error.message}</p>
                     `;
+                } finally {
+                    // Hide loading state
+                    processBtn.disabled = false;
+                    loading.style.display = 'none';
                 }
             }
         </script>
@@ -263,6 +319,7 @@ def process_files():
         
         # Create temporary directory for uploaded files
         temp_dir = tempfile.mkdtemp(prefix="rag_upload_")
+        logger.info(f"Created temporary directory: {temp_dir}")
         
         try:
             files_saved = 0
@@ -276,6 +333,7 @@ def process_files():
                         file_path = os.path.join(temp_dir, filename)
                         file.save(file_path)
                         files_saved += 1
+                        logger.info(f"Saved file: {filename}")
             
             if files_saved == 0:
                 return jsonify({
@@ -283,16 +341,18 @@ def process_files():
                     "message": "No valid files were uploaded"
                 }), 400
             
+            logger.info(f"Processing {files_saved} files with user credentials")
             # Process the uploaded files with user credentials
             result = process_files_with_credentials(temp_dir, credentials)
             return jsonify(result)
             
         finally:
             # Clean up temporary directory
+            logger.info(f"Cleaning up temporary directory: {temp_dir}")
             shutil.rmtree(temp_dir, ignore_errors=True)
             
     except Exception as e:
-        logger.error(f"Error in process_files endpoint: {e}")
+        logger.error(f"Error in process_files endpoint: {e}\n{traceback.format_exc()}")
         return jsonify({
             "success": False,
             "message": "Error processing files",
@@ -301,4 +361,7 @@ def process_files():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
+    
+    logger.info(f"Starting server on port {port}, debug={debug_mode}")
+    app.run(host="0.0.0.0", port=port, debug=debug_mode)

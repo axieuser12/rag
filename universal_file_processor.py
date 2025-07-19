@@ -1,5 +1,6 @@
 import os
 import json
+import re
 import tiktoken
 from pathlib import Path
 from typing import List, Dict, Any
@@ -27,6 +28,20 @@ class UniversalFileProcessor:
         if not self.supabase_url or not self.supabase_service_key:
             raise ValueError("Supabase credentials not provided")
         return create_client(self.supabase_url, self.supabase_service_key)
+    
+    def clean_text(self, text: str) -> str:
+        """Clean and normalize text content"""
+        if not text:
+            return ""
+        
+        # Remove excessive whitespace
+        text = re.sub(r'\s+', ' ', text)
+        text = re.sub(r'\n\s*\n\s*\n+', '\n\n', text)
+        
+        # Remove special characters that might cause issues
+        text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x84\x86-\x9f]', '', text)
+        
+        return text.strip()
         
     def extract_text_from_file(self, file_path: str, file_content: bytes = None) -> str:
         """Extract text from various file formats"""
@@ -35,10 +50,11 @@ class UniversalFileProcessor:
         try:
             if file_extension == '.txt':
                 if file_content:
-                    return file_content.decode('utf-8', errors='ignore')
+                    text = file_content.decode('utf-8', errors='ignore')
                 else:
                     with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
-                        return file.read()
+                        text = file.read()
+                return self.clean_text(text)
             
             elif file_extension == '.pdf':
                 try:
@@ -51,31 +67,40 @@ class UniversalFileProcessor:
                         with open(file_path, 'rb') as file:
                             pdf_reader = PyPDF2.PdfReader(file)
                     
-                    text = ""
-                    for page in pdf_reader.pages:
-                        text += page.extract_text() + "\n"
-                    return text
+                    text_parts = []
+                    for i, page in enumerate(pdf_reader.pages):
+                        try:
+                            page_text = page.extract_text()
+                            if page_text.strip():
+                                text_parts.append(f"Page {i+1}:\n{page_text}")
+                        except Exception as e:
+                            print(f"Error extracting page {i+1}: {e}")
+                            continue
+                    
+                    text = "\n\n".join(text_parts)
+                    return self.clean_text(text)
                 except ImportError:
-                    print("PyPDF2 not installed. Install with: pip install PyPDF2")
-                    return ""
+                    raise ImportError("PyPDF2 not installed. Install with: pip install PyPDF2")
             
             elif file_extension in ['.doc', '.docx']:
                 try:
-                    import docx
+                    from docx import Document
                     if file_content:
                         import io
                         doc_file = io.BytesIO(file_content)
-                        doc = docx.Document(doc_file)
+                        doc = Document(doc_file)
                     else:
-                        doc = docx.Document(file_path)
+                        doc = Document(file_path)
                     
-                    text = ""
+                    text_parts = []
                     for paragraph in doc.paragraphs:
-                        text += paragraph.text + "\n"
-                    return text
+                        if paragraph.text.strip():
+                            text_parts.append(paragraph.text)
+                    
+                    text = "\n\n".join(text_parts)
+                    return self.clean_text(text)
                 except ImportError:
-                    print("python-docx not installed. Install with: pip install python-docx")
-                    return ""
+                    raise ImportError("python-docx not installed. Install with: pip install python-docx")
             
             elif file_extension == '.csv':
                 try:
@@ -87,20 +112,33 @@ class UniversalFileProcessor:
                     else:
                         df = pd.read_csv(file_path)
                     
-                    # Convert DataFrame to text representation
-                    text = df.to_string(index=False)
-                    return text
+                    # Convert DataFrame to structured text
+                    text_parts = []
+                    text_parts.append(f"CSV Data with {len(df)} rows and {len(df.columns)} columns")
+                    text_parts.append(f"Columns: {', '.join(df.columns.tolist())}")
+                    text_parts.append("")
+                    
+                    # Add sample data
+                    for idx, row in df.head(100).iterrows():  # Limit to first 100 rows
+                        row_text = f"Row {idx + 1}: "
+                        row_items = []
+                        for col, val in row.items():
+                            if pd.notna(val) and str(val).strip():
+                                row_items.append(f"{col}: {val}")
+                        if row_items:
+                            row_text += "; ".join(row_items)
+                            text_parts.append(row_text)
+                    
+                    text = "\n".join(text_parts)
+                    return self.clean_text(text)
                 except ImportError:
-                    print("pandas not installed. Install with: pip install pandas")
-                    return ""
+                    raise ImportError("pandas not installed. Install with: pip install pandas")
             
             else:
-                print(f"Unsupported file format: {file_extension}")
-                return ""
+                raise ValueError(f"Unsupported file format: {file_extension}")
                 
         except Exception as e:
-            print(f"Error extracting text from {file_path}: {e}")
-            return ""
+            raise Exception(f"Error extracting text from {file_path}: {e}")
     
     def count_tokens(self, text: str, model: str = "gpt-3.5-turbo") -> int:
         """Count tokens in text using tiktoken"""
@@ -119,8 +157,8 @@ class UniversalFileProcessor:
         
         # Initialize text splitter
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200,
+            chunk_size=800,  # Smaller chunks for better embedding quality
+            chunk_overlap=100,
             length_function=len,
             separators=["\n\n", "\n", ". ", " ", ""]
         )
@@ -132,16 +170,22 @@ class UniversalFileProcessor:
         chunk_objects = []
         for i, chunk in enumerate(chunks):
             if chunk.strip():  # Only add non-empty chunks
+                # Clean the chunk
+                clean_chunk = self.clean_text(chunk)
+                if len(clean_chunk) < 20:  # Skip very short chunks
+                    continue
+                
                 chunk_obj = {
-                    "content": chunk.strip(),
+                    "content": clean_chunk,
                     "source": source,
                     "title": title or Path(source).stem,
                     "chunk_index": i,
                     "chunk_type": "text",
-                    "token_count": self.count_tokens(chunk),
+                    "token_count": self.count_tokens(clean_chunk),
                     "metadata": {
                         "file_extension": Path(source).suffix.lower(),
-                        "total_chunks": len(chunks)
+                        "total_chunks": len(chunks),
+                        "char_count": len(clean_chunk)
                     }
                 }
                 chunk_objects.append(chunk_obj)
@@ -152,49 +196,71 @@ class UniversalFileProcessor:
         """Generate embedding for text"""
         try:
             client = self.get_openai_client()
+            
+            # Truncate text if too long for embedding model
+            max_length = 8000
+            if len(text) > max_length:
+                text = text[:max_length]
+            
             response = client.embeddings.create(
-                input=text[:8000],  # Limit text length for embedding
+                input=text,
                 model="text-embedding-3-small"
             )
             return response.data[0].embedding
         except Exception as e:
-            print(f"Error generating embedding: {e}")
-            return None
+            raise Exception(f"Error generating embedding: {e}")
     
     def process_file(self, file_path: str, file_content: bytes = None) -> List[Dict[str, Any]]:
         """Process a single file and return chunks"""
         print(f"Processing file: {file_path}")
         
-        # Extract text from file
-        text = self.extract_text_from_file(file_path, file_content)
-        
-        if not text.strip():
-            print(f"No text extracted from {file_path}")
-            return []
-        
-        # Create chunks
-        chunks = self.create_chunks(text, file_path)
-        
-        print(f"Created {len(chunks)} chunks from {file_path}")
-        return chunks
+        try:
+            # Extract text from file
+            text = self.extract_text_from_file(file_path, file_content)
+            
+            if not text.strip():
+                raise ValueError(f"No text could be extracted from {file_path}")
+            
+            # Create chunks
+            chunks = self.create_chunks(text, file_path)
+            
+            if not chunks:
+                raise ValueError(f"No valid chunks could be created from {file_path}")
+            
+            print(f"Created {len(chunks)} chunks from {file_path}")
+            return chunks
+            
+        except Exception as e:
+            print(f"Error processing {file_path}: {e}")
+            raise
     
     def upload_to_supabase(self, chunks: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Upload all chunks to Supabase with embeddings"""
         print("Starting upload to Supabase...")
         
-        # Get user's Supabase client
-        supabase = self.get_supabase_client()
+        try:
+            # Get user's Supabase client
+            supabase = self.get_supabase_client()
+            
+            # Test connection
+            health_check = supabase.table("documents").select("id").limit(1).execute()
+            print("Supabase connection verified")
+            
+        except Exception as e:
+            raise Exception(f"Failed to connect to Supabase: {e}")
         
         successful_uploads = 0
         failed_uploads = 0
+        embedding_errors = 0
         
         for i, chunk in enumerate(chunks, 1):
             try:
                 # Generate embedding
-                embedding = self.get_embedding(chunk["content"])
-                if embedding is None:
-                    print(f"Chunk {i}: Failed to generate embedding")
-                    failed_uploads += 1
+                try:
+                    embedding = self.get_embedding(chunk["content"])
+                except Exception as e:
+                    print(f"Chunk {i}: Failed to generate embedding - {e}")
+                    embedding_errors += 1
                     continue
                 
                 # Prepare data for Supabase
@@ -227,10 +293,11 @@ class UniversalFileProcessor:
         result = {
             "successful_uploads": successful_uploads,
             "failed_uploads": failed_uploads,
+            "embedding_errors": embedding_errors,
             "total_chunks": len(chunks)
         }
         
-        print(f"Upload complete! Success: {successful_uploads}, Failed: {failed_uploads}")
+        print(f"Upload complete! Success: {successful_uploads}, Failed: {failed_uploads}, Embedding errors: {embedding_errors}")
         return result
 
 def main():
