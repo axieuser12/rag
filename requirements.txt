@@ -16,12 +16,9 @@ psycopg2-binary==2.9.9
 PyPDF2==3.0.1
 python-docx==1.1.0
 pandas==2.2.0
-openpyxl==3.1.2
 
 # Text processing and encoding
 chardet==5.2.0
-python-magic-bin==0.4.14
-langchain==0.1.9
 langchain-text-splitters==0.0.1
 
 # Utilities
