@@ -51,15 +51,35 @@ class UniversalFileProcessor:
         try:
             if file_extension == '.txt':
                 if file_content:
-                    text = file_content.decode('utf-8', errors='ignore')
+                    # Detect encoding
+                    detected = chardet.detect(file_content)
+                    encoding = detected.get('encoding', 'utf-8') if detected else 'utf-8'
+                    try:
+                        text = file_content.decode(encoding)
+                    except (UnicodeDecodeError, LookupError):
+                        text = file_content.decode('utf-8', errors='ignore')
                 else:
-                    with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
-                        text = file.read()
+                    # Detect encoding for file
+                    with open(file_path, 'rb') as f:
+                        raw_data = f.read()
+                        detected = chardet.detect(raw_data)
+                        encoding = detected.get('encoding', 'utf-8') if detected else 'utf-8'
+                    
+                    try:
+                        with open(file_path, 'r', encoding=encoding) as file:
+                            text = file.read()
+                    except (UnicodeDecodeError, LookupError):
+                        with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
+                            text = file.read()
                 return self.clean_text(text)
             
             elif file_extension == '.pdf':
                 try:
                     import PyPDF2
+                except ImportError:
+                    raise ImportError("PyPDF2 library not available. PDF processing is not supported in this deployment.")
+                
+                try:
                     if file_content:
                         import io
                         pdf_file = io.BytesIO(file_content)
@@ -80,12 +100,16 @@ class UniversalFileProcessor:
                     
                     text = "\n\n".join(text_parts)
                     return self.clean_text(text)
-                except ImportError:
-                    raise ImportError("PyPDF2 not installed. Install with: pip install PyPDF2")
+                except Exception as e:
+                    raise Exception(f"Error processing PDF file: {e}")
             
             elif file_extension in ['.doc', '.docx']:
                 try:
                     from docx import Document
+                except ImportError:
+                    raise ImportError("python-docx library not available. Word document processing is not supported in this deployment.")
+                
+                try:
                     if file_content:
                         import io
                         doc_file = io.BytesIO(file_content)
@@ -100,12 +124,16 @@ class UniversalFileProcessor:
                     
                     text = "\n\n".join(text_parts)
                     return self.clean_text(text)
-                except ImportError:
-                    raise ImportError("python-docx not installed. Install with: pip install python-docx")
+                except Exception as e:
+                    raise Exception(f"Error processing Word document: {e}")
             
             elif file_extension == '.csv':
                 try:
                     import pandas as pd
+                except ImportError:
+                    raise ImportError("pandas library not available. CSV processing is not supported in this deployment.")
+                
+                try:
                     if file_content:
                         import io
                         csv_file = io.StringIO(file_content.decode('utf-8', errors='ignore'))
@@ -132,14 +160,14 @@ class UniversalFileProcessor:
                     
                     text = "\n".join(text_parts)
                     return self.clean_text(text)
-                except ImportError:
-                    raise ImportError("pandas not installed. Install with: pip install pandas")
+                except Exception as e:
+                    raise Exception(f"Error processing CSV file: {e}")
             
             else:
                 raise ValueError(f"Unsupported file format: {file_extension}")
                 
         except Exception as e:
-            raise Exception(f"Error extracting text from {file_path}: {e}")
+            raise Exception(f"Error extracting text from {Path(file_path).name}: {e}")
     
     def count_tokens(self, text: str, model: str = "gpt-3.5-turbo") -> int:
         """Count tokens in text using tiktoken"""

@@ -300,6 +300,20 @@ def index():
 def process_files():
     """Handle file upload and processing"""
     logger.info("Received file processing request")
+    
+    # Ensure we always return JSON
+    try:
+        return _process_files_internal()
+    except Exception as e:
+        logger.error(f"Unexpected error in process_files: {e}\n{traceback.format_exc()}")
+        return jsonify({
+            "success": False,
+            "message": "An unexpected error occurred while processing your request",
+            "error": str(e)
+        }), 500
+
+def _process_files_internal():
+    """Internal file processing logic"""
     try:
         # Extract credentials from form data
         credentials = {
@@ -366,7 +380,6 @@ def process_files():
             "success": False,
             "message": "Error processing files",
             "error": str(e)
-        }), 500
 
 # Static file serving for production
 @app.route('/assets/<path:path>')
