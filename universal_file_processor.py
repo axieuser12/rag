@@ -2,6 +2,7 @@ import os
 import json
 import re
 import tiktoken
+import chardet
 from pathlib import Path
 from typing import List, Dict, Any
 from langchain.text_splitter import RecursiveCharacterTextSplitter
