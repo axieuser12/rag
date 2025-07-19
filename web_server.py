@@ -174,6 +174,11 @@ def health_check():
         "environment": os.environ.get("RAILWAY_ENVIRONMENT", "development")
     })
 
+@app.route('/api/health', methods=['GET'])
+def api_health_check():
+    """API Health check endpoint"""
+    return health_check()
+
 @app.route('/', methods=['GET'])
 def index():
     """Serve the main page"""
@@ -330,6 +335,10 @@ def process_files():
             "error": str(e)
         }), 500
 
+@app.route('/api/process-files', methods=['POST'])
+def api_process_files():
+    """API endpoint for file upload and processing"""
+    return process_files()
 def _process_files_internal():
     """Internal file processing logic"""
     try:
