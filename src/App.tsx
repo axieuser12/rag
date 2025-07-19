@@ -172,6 +172,7 @@ function App() {
               <FileUploader 
                 onFilesSelected={handleFilesSelected}
                 selectedFiles={files}
+                maxFiles={maxFiles}
               />
 
               {files.length > 0 && (
