@@ -181,7 +181,7 @@ export const translations: Translations = {
     setupStep1: 'Create an OpenAI account and generate an API key',
     setupStep2: 'Create a Supabase project and enable the pgvector extension in SQL Editor',
     setupStep3: 'Run the SQL schema from the results page to create the documents table',
-    setupStep4: 'Copy your project URL and service role key from Supabase settings'
+    setupStep4: 'Copy your project URL and service role key from Supabase settings',
     
     // SQL Setup Modal
     sqlSetup: 'SQL Setup',
