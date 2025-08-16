@@ -85,7 +85,7 @@ export const translations: Translations = {
     setupStep1: 'Skapa ett OpenAI-konto och generera en API-nyckel',
     setupStep2: 'Skapa ett Supabase-projekt och aktivera pgvector-tillägget i SQL Editor',
     setupStep3: 'Kör SQL-schemat från resultatsidan för att skapa dokumenttabellen',
-    setupStep4: 'Kopiera din projekt-URL och tjänstnyckel från Supabase-inställningar'
+    setupStep4: 'Kopiera din projekt-URL och tjänstnyckel från Supabase-inställningar',
     
     // SQL Setup Modal
     sqlSetup: 'SQL Setup',
