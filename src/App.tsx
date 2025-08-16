@@ -6,6 +6,7 @@ import FileUploader from './components/FileUploader.tsx';
 import ProcessingStatus from './components/ProcessingStatus.tsx';
 import ResultsDisplay from './components/ResultsDisplay.tsx';
 import CredentialsForm from './components/CredentialsForm.tsx';
+import SqlSetupModal from './components/SqlSetupModal.tsx';
 
 interface ProcessingResult {
   success: boolean;
@@ -35,6 +36,7 @@ function App() {
   const [result, setResult] = useState<ProcessingResult | null>(null);
   const [credentials, setCredentials] = useState<Credentials | null>(null);
   const [showCredentials, setShowCredentials] = useState(false);
+  const [showSqlSetup, setShowSqlSetup] = useState(false);
 
   // Load credentials from localStorage on component mount
   useEffect(() => {
@@ -148,6 +150,13 @@ function App() {
                   {t('changeCredentials')}
                 </button>
               )}
+              <button
+                onClick={() => setShowSqlSetup(true)}
+                className="flex items-center px-4 py-2 text-sm bg-green-600/80 text-white rounded-lg hover:bg-green-600 transition-colors"
+              >
+                <Database className="w-4 h-4 mr-2" />
+                {t('sqlSetup')}
+              </button>
               <button
                 onClick={() => setShowCredentials(true)}
                 className="flex items-center px-4 py-2 text-sm bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors"
@@ -274,6 +283,11 @@ function App() {
           onClose={() => setShowCredentials(false)}
           initialCredentials={credentials}
         />
+      )}
+
+      {/* SQL Setup Modal */}
+      {showSqlSetup && (
+        <SqlSetupModal onClose={() => setShowSqlSetup(false)} />
       )}
     </div>
   );

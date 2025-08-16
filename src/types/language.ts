@@ -86,6 +86,31 @@ export const translations: Translations = {
     setupStep2: 'Skapa ett Supabase-projekt och aktivera pgvector-tillägget i SQL Editor',
     setupStep3: 'Kör SQL-schemat från resultatsidan för att skapa dokumenttabellen',
     setupStep4: 'Kopiera din projekt-URL och tjänstnyckel från Supabase-inställningar'
+    
+    // SQL Setup Modal
+    sqlSetup: 'SQL Setup',
+    sqlSetupTitle: 'Supabase Databasuppsättning',
+    setupInstructions: 'Installationsinstruktioner:',
+    sqlStep1: 'Öppna din Supabase-dashboard och navigera till SQL Editor',
+    sqlStep2: 'Kopiera SQL-kommandona nedan',
+    sqlStep3: 'Klistra in och kör kommandona i SQL Editor',
+    sqlStep4: 'Verifiera att tabellen "documents" skapades under Database > Tables',
+    openSupabaseDashboard: 'Öppna Supabase Dashboard',
+    sqlCommands: 'SQL-kommandon:',
+    copySQL: 'Kopiera SQL',
+    copied: 'Kopierat!',
+    close: 'Stäng',
+    whatThisCreates: 'Vad detta skapar:',
+    documentsTable: 'Documents Table',
+    documentsTableDesc: 'Lagrar dina dokument med vektorinbäddningar',
+    vectorIndex: 'Vector Index',
+    vectorIndexDesc: 'Möjliggör snabb semantisk sökning',
+    searchFunction: 'Search Function',
+    searchFunctionDesc: 'Färdig funktion för att söka liknande dokument',
+    performanceIndexes: 'Performance Indexes',
+    performanceIndexesDesc: 'Optimerar frågor på källa och datum',
+    important: 'Viktigt',
+    pgvectorWarning: 'Kontrollera att pgvector-tillägget är aktiverat i din Supabase-instans innan du kör dessa kommandon.'
   },
   en: {
     // Header
@@ -157,5 +182,30 @@ export const translations: Translations = {
     setupStep2: 'Create a Supabase project and enable the pgvector extension in SQL Editor',
     setupStep3: 'Run the SQL schema from the results page to create the documents table',
     setupStep4: 'Copy your project URL and service role key from Supabase settings'
+    
+    // SQL Setup Modal
+    sqlSetup: 'SQL Setup',
+    sqlSetupTitle: 'Supabase Database Setup',
+    setupInstructions: 'Setup Instructions:',
+    sqlStep1: 'Open your Supabase dashboard and navigate to SQL Editor',
+    sqlStep2: 'Copy the SQL commands below',
+    sqlStep3: 'Paste and run the commands in SQL Editor',
+    sqlStep4: 'Verify that the "documents" table was created under Database > Tables',
+    openSupabaseDashboard: 'Open Supabase Dashboard',
+    sqlCommands: 'SQL Commands:',
+    copySQL: 'Copy SQL',
+    copied: 'Copied!',
+    close: 'Close',
+    whatThisCreates: 'What this creates:',
+    documentsTable: 'Documents Table',
+    documentsTableDesc: 'Stores your documents with vector embeddings',
+    vectorIndex: 'Vector Index',
+    vectorIndexDesc: 'Enables fast semantic search',
+    searchFunction: 'Search Function',
+    searchFunctionDesc: 'Ready-to-use function for finding similar documents',
+    performanceIndexes: 'Performance Indexes',
+    performanceIndexesDesc: 'Optimizes queries on source and date',
+    important: 'Important',
+    pgvectorWarning: 'Make sure the pgvector extension is enabled in your Supabase instance before running these commands.'
   }
 };
