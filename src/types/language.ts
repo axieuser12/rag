@@ -109,6 +109,13 @@ export const translations: Translations = {
     performanceIndexes: 'Performance Indexes',
     performanceIndexesDesc: 'Optimizes queries on source and date',
     important: 'Important',
-    pgvectorWarning: 'Make sure the pgvector extension is enabled in your Supabase instance before running these commands.'
+    pgvectorWarning: 'Make sure the pgvector extension is enabled in your Supabase instance before running these commands.',
+    
+    // PWA
+    installApp: 'Install App',
+    installNow: 'Install Now',
+    installLater: 'Later',
+    installPrompt: 'Install Axie Studio RAG for quick access and offline functionality.',
+    iosInstallInstructions: 'Install this app on your iPhone: tap the Share button and then "Add to Home Screen".'
   }
 };

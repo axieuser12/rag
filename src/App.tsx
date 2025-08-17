@@ -1,11 +1,13 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Upload, FileText, Database, CheckCircle, AlertCircle, Loader2, Brain, Zap, Settings, Key, Shield } from 'lucide-react';
 import { useLanguage } from './hooks/useLanguage';
+import { usePWA } from './hooks/usePWA';
 import FileUploader from './components/FileUploader.tsx';
 import ProcessingStatus from './components/ProcessingStatus.tsx';
 import ResultsDisplay from './components/ResultsDisplay.tsx';
 import CredentialsForm from './components/CredentialsForm.tsx';
 import SqlSetupModal from './components/SqlSetupModal.tsx';
+import PWAInstallButton from './components/PWAInstallButton.tsx';
 
 interface ProcessingResult {
   success: boolean;
@@ -30,6 +32,7 @@ interface Credentials {
 
 function App() {
   const { t } = useLanguage();
+  const { isStandalone } = usePWA();
   const [files, setFiles] = useState<File[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<ProcessingResult | null>(null);
@@ -283,6 +286,9 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* PWA Install Button */}
+      <PWAInstallButton />
 
       {/* Credentials Modal */}
       {showCredentials && (
