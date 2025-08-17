@@ -2,34 +2,26 @@ import { useState, useEffect } from 'react';
 import { translations } from '../types/language';
 
 export const useLanguage = () => {
-  const [currentLanguage, setCurrentLanguage] = useState<string>(() => {
-    // Check localStorage first, then default to Swedish
-    const saved = localStorage.getItem('rag-language');
-    return saved || 'sv';
-  });
+  const [currentLanguage] = useState<string>('en');
 
   useEffect(() => {
-    // Save language preference to localStorage
-    localStorage.setItem('rag-language', currentLanguage);
-    
     // Update document language attribute
-    document.documentElement.lang = currentLanguage;
+    document.documentElement.lang = 'en';
     
-    // Update document title based on language
-    const title = currentLanguage === 'sv' ? 'Axie Studio RAG Filbehandlare' : 'Axie Studio RAG File Processor';
-    document.title = title;
-  }, [currentLanguage]);
+    // Update document title
+    document.title = 'Axie Studio RAG File Processor';
+  }, []);
 
   const t = (key: string): string => {
-    return translations[currentLanguage]?.[key] || translations['en']?.[key] || key;
+    return translations['en']?.[key] || key;
   };
 
-  const switchLanguage = (languageCode: string) => {
-    setCurrentLanguage(languageCode);
+  const switchLanguage = () => {
+    // No-op since we only have English now
   };
 
   return {
-    currentLanguage,
+    currentLanguage: 'en',
     t,
     switchLanguage
   };

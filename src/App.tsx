@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Upload, FileText, Database, CheckCircle, AlertCircle, Loader2, Brain, Zap, Settings, Key, Shield } from 'lucide-react';
 import { useLanguage } from './hooks/useLanguage';
-import LanguageToggle from './components/LanguageToggle';
 import FileUploader from './components/FileUploader.tsx';
 import ProcessingStatus from './components/ProcessingStatus.tsx';
 import ResultsDisplay from './components/ResultsDisplay.tsx';
@@ -119,7 +118,6 @@ function App() {
 
   return (
     <div className="min-h-screen gradient-bg">
-      <LanguageToggle />
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">

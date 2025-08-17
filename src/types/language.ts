@@ -5,7 +5,6 @@ export interface Language {
 }
 
 export const languages: Language[] = [
-  { code: 'sv', name: 'Svenska', flag: '🇸🇪' },
   { code: 'en', name: 'English', flag: '🇺🇸' }
 ];
 
@@ -16,102 +15,6 @@ export interface Translations {
 }
 
 export const translations: Translations = {
-  sv: {
-    // Header
-    title: 'Axie Studio RAG Filbehandlare',
-    subtitle: 'Ladda upp dina dokument och skapa en sökbar kunskapsbas med dina egna OpenAI och Supabase-uppgifter',
-    
-    // Credentials
-    credentialsConfigured: 'Uppgifter konfigurerade ✓',
-    credentialsRequired: 'Uppgifter krävs',
-    changeCredentials: 'Ändra uppgifter',
-    setupCredentials: 'Konfigurera',
-    updateCredentials: 'Uppdatera',
-    
-    // File Upload
-    uploadFiles: 'Ladda upp filer',
-    dragDropFiles: 'Dra och släpp filer här, eller klicka för att bläddra',
-    supportedFormats: 'Format som stöds: TXT, PDF, DOC, DOCX, CSV (Max 16MB per fil)',
-    selectedFiles: 'Valda filer:',
-    processFiles: 'Bearbeta filer',
-    processing: 'Bearbetar...',
-    clearAll: 'Rensa alla',
-    fileLimitReached: 'Maxgräns nådd (5 filer)',
-    fileLimitWarning: 'Du kan bearbeta maximalt 5 filer åt gången',
-    
-    // Processing Status
-    processingFiles: 'Bearbetar filer',
-    pleaseWait: 'Vänta medan vi bearbetar dina filer och skapar inbäddningar...',
-    extractingText: 'Extraherar text',
-    readingContents: 'Läser filinnehåll',
-    creatingEmbeddings: 'Skapar inbäddningar',
-    usingOpenAI: 'Använder OpenAI API',
-    storingData: 'Lagrar data',
-    uploadingSupabase: 'Laddar upp till Supabase',
-    processingTime: 'Denna process kan ta några minuter beroende på filstorlek och antal filer',
-    
-    // Results
-    processingComplete: 'Bearbetning klar!',
-    processingFailed: 'Bearbetning misslyckades',
-    filesProcessed: 'Filer bearbetade',
-    chunksCreated: 'Delar skapade',
-    uploadedToSupabase: 'Uppladdade till Supabase',
-    
-    // Features
-    secure: 'Säker',
-    secureDesc: 'Dina uppgifter lagras aldrig på våra servrar',
-    multipleFormats: 'Flera format',
-    multipleFormatsDesc: 'Stöd för TXT, PDF, Word och CSV-filer',
-    yourDatabase: 'Din databas',
-    yourDatabaseDesc: 'Data lagras i din egen Supabase-instans',
-    aiPowered: 'AI-driven',
-    aiPoweredDesc: 'Smart bearbetning med din OpenAI API',
-    
-    // Credentials Form
-    configureCredentials: 'Konfigurera uppgifter',
-    credentialsSecure: 'Dina uppgifter är säkra',
-    credentialsNotStored: 'Uppgifter används endast för denna session och lagras aldrig på våra servrar. De skickas direkt till dina egna OpenAI och Supabase-tjänster.',
-    openaiApiKey: 'OpenAI API-nyckel',
-    supabaseProjectUrl: 'Supabase projekt-URL',
-    supabaseServiceKey: 'Supabase tjänstnyckel',
-    saveCredentials: 'Spara uppgifter',
-    cancel: 'Avbryt',
-    
-    // Errors and validation
-    credentialsBeforeProcessing: 'Vänligen konfigurera dina uppgifter innan du bearbetar filer',
-    
-    // Quick setup guide
-    quickSetupGuide: 'Snabb installationsguide:',
-    setupStep1: 'Skapa ett OpenAI-konto och generera en API-nyckel',
-    setupStep2: 'Skapa ett Supabase-projekt och aktivera pgvector-tillägget i SQL Editor',
-    setupStep3: 'Kör SQL-schemat från resultatsidan för att skapa dokumenttabellen',
-    setupStep4: 'Kopiera din projekt-URL och tjänstnyckel från Supabase-inställningar',
-    
-    // SQL Setup Modal
-    sqlSetup: 'SQL Setup',
-    sqlSetupTitle: 'Supabase Databasuppsättning',
-    setupInstructions: 'Installationsinstruktioner:',
-    sqlStep1: 'Öppna din Supabase-dashboard och navigera till SQL Editor',
-    sqlStep2: 'Kopiera SQL-kommandona nedan',
-    sqlStep3: 'Klistra in och kör kommandona i SQL Editor',
-    sqlStep4: 'Verifiera att tabellen "documents" skapades under Database > Tables',
-    openSupabaseDashboard: 'Öppna Supabase Dashboard',
-    sqlCommands: 'SQL-kommandon:',
-    copySQL: 'Kopiera SQL',
-    copied: 'Kopierat!',
-    close: 'Stäng',
-    whatThisCreates: 'Vad detta skapar:',
-    documentsTable: 'Documents Table',
-    documentsTableDesc: 'Lagrar dina dokument med vektorinbäddningar',
-    vectorIndex: 'Vector Index',
-    vectorIndexDesc: 'Möjliggör snabb semantisk sökning',
-    searchFunction: 'Search Function',
-    searchFunctionDesc: 'Färdig funktion för att söka liknande dokument',
-    performanceIndexes: 'Performance Indexes',
-    performanceIndexesDesc: 'Optimerar frågor på källa och datum',
-    important: 'Viktigt',
-    pgvectorWarning: 'Kontrollera att pgvector-tillägget är aktiverat i din Supabase-instans innan du kör dessa kommandon.'
-  },
   en: {
     // Header
     title: 'Axie Studio RAG File Processor',
