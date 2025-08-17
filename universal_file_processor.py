@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import List, Dict, Any
 from enhanced_embeddings import run_enhanced_processing, EnhancedEmbeddingProcessor
 from intelligent_embeddings import run_intelligent_processing, SmartRetriever
+from adaptive_embeddings import run_adaptive_processing
+from neural_embeddings import run_neural_processing
 
 # Simple text splitter implementation
 class SimpleTextSplitter:
@@ -331,15 +333,69 @@ class UniversalFileProcessor:
         """Upload all chunks to Supabase with embeddings"""
         print("Starting upload to Supabase...")
         
-        # Try intelligent processing first (best quality)
+        # Try neural processing first (cutting-edge)
         try:
-            print("Using intelligent embedding processing with categorization...")
-            result = run_intelligent_processing(
+            print("Using neural embedding processing with deep learning...")
+            result = asyncio.run(run_neural_processing(
                 chunks, 
                 self.openai_api_key, 
                 self.supabase_url, 
                 self.supabase_service_key
-            )
+            ))
+            
+            # Convert to expected format
+            return {
+                'successful_uploads': result['upload_stats']['successful_uploads'],
+                'failed_uploads': result['upload_stats']['failed_uploads'],
+                'embedding_errors': result.get('failed_embeddings', 0),
+                'total_chunks': result['chunks_processed'],
+                'neural_chunks_created': result['neural_chunks_created'],
+                'hybrid_embeddings_count': result['upload_stats']['hybrid_embeddings_count'],
+                'clusters_identified': result['upload_stats']['clusters_identified'],
+                'performance_stats': result.get('performance_stats', {})
+            }
+            
+        except Exception as e:
+            print(f"Neural processing failed, falling back to adaptive: {e}")
+            # Fall back to adaptive processing
+            pass
+        
+        # Try adaptive processing (self-improving)
+        try:
+            print("Using adaptive embedding processing with dynamic optimization...")
+            result = asyncio.run(run_adaptive_processing(
+                chunks, 
+                self.openai_api_key, 
+                self.supabase_url, 
+                self.supabase_service_key
+            ))
+            
+            # Convert to expected format
+            return {
+                'successful_uploads': result['upload_stats']['successful_uploads'],
+                'failed_uploads': result['upload_stats']['failed_uploads'],
+                'embedding_errors': result.get('failed_embeddings', 0),
+                'total_chunks': result['chunks_processed'],
+                'adaptive_chunks_created': result['adaptive_chunks_created'],
+                'high_quality_chunks': result['upload_stats']['high_quality_uploads'],
+                'concept_extractions': result['upload_stats']['concept_extractions'],
+                'performance_stats': result.get('performance_stats', {})
+            }
+            
+        except Exception as e:
+            print(f"Adaptive processing failed, falling back to intelligent: {e}")
+            # Fall back to intelligent processing
+            pass
+        
+        # Try intelligent processing (semantic categorization)
+        try:
+            print("Using intelligent embedding processing with categorization...")
+            result = asyncio.run(run_intelligent_processing(
+                chunks, 
+                self.openai_api_key, 
+                self.supabase_url, 
+                self.supabase_service_key
+            ))
             
             # Convert to expected format
             return {
@@ -355,18 +411,18 @@ class UniversalFileProcessor:
             
         except Exception as e:
             print(f"Intelligent processing failed, falling back to enhanced: {e}")
-            # Fall back to enhanced processing
+            # Fall back to enhanced batch processing
             pass
         
-        # Use enhanced processing if intelligent fails
+        # Use enhanced batch processing
         try:
             print("Using enhanced batch processing...")
-            result = run_enhanced_processing(
+            result = asyncio.run(run_enhanced_processing(
                 chunks, 
                 self.openai_api_key, 
                 self.supabase_url, 
                 self.supabase_service_key
-            )
+            ))
             
             # Convert to expected format
             return {
@@ -379,9 +435,10 @@ class UniversalFileProcessor:
             
         except Exception as e:
             print(f"Enhanced processing failed, falling back to original: {e}")
-            # Fall back to original implementation
+            # Fall back to basic implementation
             pass
         
+        # Basic implementation (fallback)
         try:
             # Get user's Supabase client
             supabase = self.get_supabase_client()
