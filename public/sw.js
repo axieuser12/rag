@@ -4,8 +4,7 @@ const urlsToCache = [
   '/static/js/bundle.js',
   '/static/css/main.css',
   '/manifest.json',
-  '/c09c673465270e53fed0666cae1a9b69.ico/favicon.ico',
-  '/c09c673465270e53fed0666cae1a9b69.ico/android-icon-192x192.png'
+  'https://www.axiestudio.se/Axiestudiologo.jpg'
 ];
 
 // Install event
@@ -68,8 +67,8 @@ function doBackgroundSync() {
 self.addEventListener('push', (event) => {
   const options = {
     body: event.data ? event.data.text() : 'New update available!',
-    icon: '/c09c673465270e53fed0666cae1a9b69.ico/android-icon-192x192.png',
-    badge: '/c09c673465270e53fed0666cae1a9b69.ico/android-icon-96x96.png',
+    icon: 'https://www.axiestudio.se/Axiestudiologo.jpg',
+    badge: 'https://www.axiestudio.se/Axiestudiologo.jpg',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
@@ -79,12 +78,12 @@ self.addEventListener('push', (event) => {
       {
         action: 'explore',
         title: 'Open App',
-        icon: '/c09c673465270e53fed0666cae1a9b69.ico/android-icon-96x96.png'
+        icon: 'https://www.axiestudio.se/Axiestudiologo.jpg'
       },
       {
         action: 'close',
         title: 'Close',
-        icon: '/c09c673465270e53fed0666cae1a9b69.ico/android-icon-96x96.png'
+        icon: 'https://www.axiestudio.se/Axiestudiologo.jpg'
       }
     ]
   };

@@ -116,6 +116,11 @@ export const translations: Translations = {
     installNow: 'Install Now',
     installLater: 'Later',
     installPrompt: 'Install Axie Studio RAG for quick access and offline functionality.',
-    iosInstallInstructions: 'Install this app on your iPhone: tap the Share button and then "Add to Home Screen".'
+    iosInstallInstructions: 'Install this app on your iPhone: tap the Share button and then "Add to Home Screen".',
+    
+    // Additional PWA translations
+    downloadApp: 'Download App',
+    installForOffline: 'Install for offline access',
+    appInstalled: 'App installed successfully!'
   }
 };
