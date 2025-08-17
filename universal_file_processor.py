@@ -5,6 +5,7 @@ import tiktoken
 import chardet
 from pathlib import Path
 from typing import List, Dict, Any
+from enhanced_embeddings import run_enhanced_processing, EnhancedEmbeddingProcessor
 
 # Simple text splitter implementation
 class SimpleTextSplitter:
@@ -328,6 +329,30 @@ class UniversalFileProcessor:
     def upload_to_supabase(self, chunks: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Upload all chunks to Supabase with embeddings"""
         print("Starting upload to Supabase...")
+        
+        # Use enhanced processing if available
+        try:
+            print("Using enhanced batch processing...")
+            result = run_enhanced_processing(
+                chunks, 
+                self.openai_api_key, 
+                self.supabase_url, 
+                self.supabase_service_key
+            )
+            
+            # Convert to expected format
+            return {
+                'successful_uploads': result['upload_stats']['successful_uploads'],
+                'failed_uploads': result['upload_stats']['failed_uploads'],
+                'embedding_errors': result['failed_embeddings'],
+                'total_chunks': result['chunks_processed'],
+                'performance_stats': result.get('performance_stats', {})
+            }
+            
+        except Exception as e:
+            print(f"Enhanced processing failed, falling back to original: {e}")
+            # Fall back to original implementation
+            pass
         
         try:
             # Get user's Supabase client
