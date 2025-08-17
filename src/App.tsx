@@ -122,17 +122,27 @@ function App() {
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-6">
-            <div className="p-4 rounded-full glass-effect">
-              <Brain className="w-12 h-12 text-white" />
+            <div className="p-4 rounded-full glass-effect-dark">
+              <img 
+                src="https://www.axiestudio.se/Axiestudiologo.jpg" 
+                alt="Axie Studio Logo" 
+                className="w-16 h-16 rounded-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.nextElementSibling.style.display = 'block';
+                }}
+              />
+              <Brain className="w-12 h-12 text-white hidden" />
             </div>
           </div>
           <h1 className="text-4xl font-bold text-white mb-4">{t('title')}</h1>
           <p className="text-xl text-white/80 max-w-2xl mx-auto">{t('subtitle')}</p>
+          <p className="text-sm text-white/60 mt-4">Powered by Axie Studio</p>
         </div>
 
         {/* Credentials Status */}
         <div className="max-w-4xl mx-auto mb-8">
-          <div className="glass-effect rounded-xl p-4 flex items-center justify-between">
+          <div className="glass-effect-dark rounded-xl p-4 flex items-center justify-between">
             <div className="flex items-center">
               <Shield className="w-5 h-5 text-white mr-3" />
               <span className="text-white">
@@ -143,21 +153,21 @@ function App() {
               {credentials && (
                 <button
                   onClick={handleClearCredentials}
-                  className="px-4 py-2 text-sm border border-white/30 text-white rounded-lg hover:bg-white/10 transition-colors"
+                  className="px-4 py-2 text-sm btn-secondary rounded-lg transition-colors"
                 >
                   {t('changeCredentials')}
                 </button>
               )}
               <button
                 onClick={() => setShowSqlSetup(true)}
-                className="flex items-center px-4 py-2 text-sm bg-green-600/80 text-white rounded-lg hover:bg-green-600 transition-colors"
+                className="flex items-center px-4 py-2 text-sm bg-gray-800 text-white rounded-lg hover:bg-gray-700 border border-white/20 transition-colors"
               >
                 <Database className="w-4 h-4 mr-2" />
                 {t('sqlSetup')}
               </button>
               <button
                 onClick={() => setShowCredentials(true)}
-                className="flex items-center px-4 py-2 text-sm bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors"
+                className="flex items-center px-4 py-2 text-sm btn-secondary rounded-lg transition-colors"
               >
                 <Key className="w-4 h-4 mr-2" />
                 {credentials ? t('updateCredentials') : t('setupCredentials')} {t('credentialsRequired').split(' ')[0]}
@@ -170,7 +180,7 @@ function App() {
         <div className="max-w-4xl mx-auto">
           <div className="grid gap-8">
             {/* File Upload Section */}
-            <div className="glass-effect rounded-2xl p-8">
+            <div className="glass-effect-dark rounded-2xl p-8">
               <div className="flex items-center mb-6">
                 <Upload className="w-6 h-6 text-white mr-3" />
                 <h2 className="text-2xl font-semibold text-white">{t('uploadFiles')}</h2>
@@ -186,7 +196,7 @@ function App() {
                   <button
                     onClick={handleProcess}
                     disabled={isProcessing || !credentials || files.length > 5}
-                    className="flex items-center px-6 py-3 bg-white text-purple-600 rounded-lg font-semibold hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center px-6 py-3 btn-primary rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isProcessing ? (
                       <>
@@ -209,7 +219,7 @@ function App() {
                   <button
                     onClick={handleClear}
                     disabled={isProcessing}
-                    className="px-6 py-3 border border-white/30 text-white rounded-lg font-semibold hover:bg-white/10 transition-colors disabled:opacity-50"
+                    className="px-6 py-3 btn-secondary rounded-lg font-semibold transition-colors disabled:opacity-50"
                   >
                     {t('clearAll')}
                   </button>
@@ -217,8 +227,8 @@ function App() {
               )}
 
               {files.length > 5 && (
-                <div className="mt-4 p-4 bg-orange-500/20 border border-orange-400/30 rounded-lg">
-                  <p className="text-orange-200 text-center flex items-center justify-center">
+                <div className="mt-4 p-4 bg-gray-800/50 border border-white/20 rounded-lg">
+                  <p className="text-white/80 text-center flex items-center justify-center">
                     <AlertCircle className="w-5 h-5 mr-2" />
                     {t('fileLimitWarning')}
                   </p>
@@ -226,8 +236,8 @@ function App() {
               )}
 
               {!credentials && files.length > 0 && (
-                <div className="mt-4 p-4 bg-yellow-500/20 border border-yellow-400/30 rounded-lg">
-                  <p className="text-yellow-200 text-center">
+                <div className="mt-4 p-4 bg-gray-800/50 border border-white/20 rounded-lg">
+                  <p className="text-white/80 text-center">
                     {t('credentialsBeforeProcessing')}
                   </p>
                 </div>
@@ -246,26 +256,26 @@ function App() {
 
             {/* Features */}
             <div className="grid md:grid-cols-4 gap-6">
-              <div className="glass-effect rounded-xl p-6 text-center">
-                <Shield className="w-8 h-8 text-green-400 mx-auto mb-4" />
+              <div className="glass-effect-dark rounded-xl p-6 text-center">
+                <Shield className="w-8 h-8 text-white mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-white mb-2">{t('secure')}</h3>
                 <p className="text-white/70">{t('secureDesc')}</p>
               </div>
               
-              <div className="glass-effect rounded-xl p-6 text-center">
-                <FileText className="w-8 h-8 text-blue-400 mx-auto mb-4" />
+              <div className="glass-effect-dark rounded-xl p-6 text-center">
+                <FileText className="w-8 h-8 text-white mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-white mb-2">{t('multipleFormats')}</h3>
                 <p className="text-white/70">{t('multipleFormatsDesc')}</p>
               </div>
               
-              <div className="glass-effect rounded-xl p-6 text-center">
-                <Database className="w-8 h-8 text-purple-400 mx-auto mb-4" />
+              <div className="glass-effect-dark rounded-xl p-6 text-center">
+                <Database className="w-8 h-8 text-white mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-white mb-2">{t('yourDatabase')}</h3>
                 <p className="text-white/70">{t('yourDatabaseDesc')}</p>
               </div>
               
-              <div className="glass-effect rounded-xl p-6 text-center">
-                <Brain className="w-8 h-8 text-orange-400 mx-auto mb-4" />
+              <div className="glass-effect-dark rounded-xl p-6 text-center">
+                <Brain className="w-8 h-8 text-white mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-white mb-2">{t('aiPowered')}</h3>
                 <p className="text-white/70">{t('aiPoweredDesc')}</p>
               </div>

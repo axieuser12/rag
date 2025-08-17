@@ -56,7 +56,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFilesSelected, selectedFi
   };
 
   return (
-    <div className="border-2 border-dashed border-white/30 rounded-lg p-6 text-center relative">
+    <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center relative">
       <input
         type="file"
         multiple
@@ -69,12 +69,12 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFilesSelected, selectedFi
       />
       <div
         className={`flex flex-col items-center justify-center p-4 rounded-lg transition-colors duration-200 ${
-          isDragOver ? 'bg-white/10 border-white/50' : 'bg-transparent'
+          isDragOver ? 'bg-white/5 border-white/30' : 'bg-transparent'
         }`}
       >
-        <UploadCloud className="w-12 h-12 text-white/70 mb-3" />
+        <UploadCloud className="w-12 h-12 text-white/80 mb-3" />
         <p className="text-white/80 text-lg font-medium">{t('dragDropFiles')}</p>
-        <p className="text-white/60 text-sm mt-1">{t('supportedFormats')}</p>
+        <p className="text-white/70 text-sm mt-1">{t('supportedFormats')}</p>
       </div>
 
       {selectedFiles.length > 0 && (
@@ -82,16 +82,16 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFilesSelected, selectedFi
           <h3 className="text-white font-semibold mb-3">{t('selectedFiles')}</h3>
           <ul className="space-y-2">
             {selectedFiles.map((file, index) => (
-              <li key={file.name + file.size + index} className="flex items-center justify-between bg-white/10 p-3 rounded-md">
+              <li key={file.name + file.size + index} className="flex items-center justify-between bg-black/20 border border-white/10 p-3 rounded-md">
                 <div className="flex items-center">
-                  <FileText className="w-5 h-5 text-white/70 mr-2" />
+                  <FileText className="w-5 h-5 text-white/80 mr-2" />
                   <span className="text-white text-sm truncate">{file.name}</span>
-                  <span className="text-white/60 text-xs ml-2">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                  <span className="text-white/70 text-xs ml-2">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                 </div>
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); handleRemoveFile(file); }}
-                  className="text-white/70 hover:text-red-400 transition-colors"
+                  className="text-white/70 hover:text-white transition-colors"
                   aria-label={`Remove ${file.name}`}
                 >
                   <XCircle className="w-5 h-5" />
