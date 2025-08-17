@@ -5,10 +5,8 @@ import tiktoken
 import chardet
 from pathlib import Path
 from typing import List, Dict, Any
-from enhanced_embeddings import run_enhanced_processing, EnhancedEmbeddingProcessor
-from intelligent_embeddings import run_intelligent_processing, SmartRetriever
-from adaptive_embeddings import run_adaptive_processing
-from neural_embeddings import run_neural_processing
+from embedding_engine import EmbeddingEngine, EmbeddingConfig, ProcessingLevel
+from embedding_engine import run_enhanced_processing, run_intelligent_processing
 
 # Simple text splitter implementation
 class SimpleTextSplitter:
@@ -333,63 +331,36 @@ class UniversalFileProcessor:
         """Upload all chunks to Supabase with embeddings"""
         print("Starting upload to Supabase...")
         
-        # Try neural processing first (cutting-edge)
+        # Use centralized embedding engine with intelligent processing
         try:
-            print("Using neural embedding processing with deep learning...")
-            result = asyncio.run(run_neural_processing(
-                chunks, 
-                self.openai_api_key, 
-                self.supabase_url, 
-                self.supabase_service_key
-            ))
+            print("Using centralized embedding engine with intelligent processing...")
             
-            # Convert to expected format
+            # Create engine with intelligent processing
+            config = EmbeddingConfig(processing_level=ProcessingLevel.INTELLIGENT)
+            engine = EmbeddingEngine(config)
+            engine.set_credentials(self.openai_api_key, self.supabase_url, self.supabase_service_key)
+            
+            # Convert chunks to documents format
+            documents = [{'content': chunk['content'], 'source': chunk['source']} for chunk in chunks]
+            
+            # Process documents
+            result = asyncio.run(engine.process_documents(documents))
+            
             return {
-                'successful_uploads': result['upload_stats']['successful_uploads'],
-                'failed_uploads': result['upload_stats']['failed_uploads'],
-                'embedding_errors': result.get('failed_embeddings', 0),
-                'total_chunks': result['chunks_processed'],
-                'neural_chunks_created': result['neural_chunks_created'],
-                'hybrid_embeddings_count': result['upload_stats']['hybrid_embeddings_count'],
-                'clusters_identified': result['upload_stats']['clusters_identified'],
-                'performance_stats': result.get('performance_stats', {})
+                'successful_uploads': result.successful_embeddings,
+                'failed_uploads': result.failed_embeddings,
+                'embedding_errors': result.failed_embeddings,
+                'total_chunks': result.chunks_processed,
+                'processing_level': result.processing_level,
+                'performance_stats': result.performance_stats
             }
             
         except Exception as e:
-            print(f"Neural processing failed, falling back to adaptive: {e}")
-            # Fall back to adaptive processing
-            pass
-        
-        # Try adaptive processing (self-improving)
-        try:
-            print("Using adaptive embedding processing with dynamic optimization...")
-            result = asyncio.run(run_adaptive_processing(
-                chunks, 
-                self.openai_api_key, 
-                self.supabase_url, 
-                self.supabase_service_key
-            ))
+            print(f"Centralized processing failed, falling back to intelligent: {e}")
             
-            # Convert to expected format
-            return {
-                'successful_uploads': result['upload_stats']['successful_uploads'],
-                'failed_uploads': result['upload_stats']['failed_uploads'],
-                'embedding_errors': result.get('failed_embeddings', 0),
-                'total_chunks': result['chunks_processed'],
-                'adaptive_chunks_created': result['adaptive_chunks_created'],
-                'high_quality_chunks': result['upload_stats']['high_quality_uploads'],
-                'concept_extractions': result['upload_stats']['concept_extractions'],
-                'performance_stats': result.get('performance_stats', {})
-            }
-            
-        except Exception as e:
-            print(f"Adaptive processing failed, falling back to intelligent: {e}")
-            # Fall back to intelligent processing
-            pass
-        
-        # Try intelligent processing (semantic categorization)
+        # Fallback to original intelligent processing
         try:
-            print("Using intelligent embedding processing with categorization...")
+            print("Using fallback intelligent processing...")
             result = asyncio.run(run_intelligent_processing(
                 chunks, 
                 self.openai_api_key, 

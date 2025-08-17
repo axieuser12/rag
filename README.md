@@ -4,29 +4,19 @@ A secure, production-ready RAG (Retrieval-Augmented Generation) system with **cu
 
 ## 🚀 **NEW: Advanced Neural Processing**
 
-This RAG system now features **4 levels of intelligent processing**:
+This RAG system now features **centralized embedding processing** with multiple levels:
 
-1. **🧠 Neural Processing** (Latest) - Deep learning with transformer models
-2. **🎯 Adaptive Processing** - Self-improving with dynamic optimization  
-3. **🔍 Intelligent Processing** - Semantic categorization and smart retrieval
-4. **⚡ Enhanced Processing** - Batch processing with retry logic
-5. **📝 Basic Processing** - Simple chunking (fallback)
+1. **🔍 Intelligent Processing** - Semantic categorization and smart retrieval
+2. **⚡ Enhanced Processing** - Batch processing with retry logic  
+3. **📝 Basic Processing** - Simple chunking (fallback)
 
-### Neural Processing Features
-- **Neural Network Chunking**: AI-powered text segmentation
-- **Hybrid Embeddings**: Multiple transformer models combined
-- **Advanced Clustering**: HDBSCAN + UMAP for semantic grouping
-- **FAISS Indexing**: Ultra-fast similarity search
-- **Query Expansion**: Neural query enhancement
-- **Real-time Quality Prediction**: ML-based chunk scoring
-
-### Adaptive Processing Features  
-- **Dynamic Chunk Sizing**: Content-aware optimization
-- **Concept Knowledge Graphs**: Relationship mapping
-- **Advanced NLP**: spaCy integration for concept extraction
-- **Self-Learning**: Parameters improve over time
-- **Cross-Reference Detection**: Document linking
-- **Quality Metrics**: Comprehensive content analysis
+### Centralized Engine Features
+- **Pluggable Strategies**: Easy to switch between processing levels
+- **Unified Configuration**: Single config object for all settings
+- **Comprehensive Stats**: Detailed performance and quality metrics
+- **Backward Compatibility**: Works with existing code
+- **Content Categorization**: Automatic classification of document types
+- **Quality Scoring**: Advanced chunk quality assessment
 
 ## 🔒 Security Features
 
@@ -156,17 +146,17 @@ npm run dev
 
 ### Advanced Setup
 
-For the full neural processing experience:
+For enhanced processing capabilities:
 
 ```bash
-# Install advanced dependencies
-pip install torch transformers sentence-transformers faiss-cpu spacy textstat networkx umap-learn hdbscan
+# Install advanced dependencies (optional)
+# pip install torch transformers sentence-transformers faiss-cpu spacy textstat networkx umap-learn hdbscan
 
 # Download spaCy English model
-python -m spacy download en_core_web_sm
+# python -m spacy download en_core_web_sm
 
-# Run setup script for model caching
-python setup_advanced_models.py
+# Test the embedding engine
+python embedding_test.py
 ```
 
 ### Deployment to Railway
@@ -207,12 +197,11 @@ The app is configured for production with:
 │   └── App.tsx                   # Main application
 ├── web_server.py                 # Flask backend
 ├── universal_file_processor.py   # File processing logic
-├── neural_embeddings.py          # 🧠 Neural processing (NEW)
-├── adaptive_embeddings.py        # 🎯 Adaptive processing (NEW)
+├── embedding_engine.py           # 🚀 Centralized embedding engine (NEW)
 ├── intelligent_embeddings.py     # 🔍 Intelligent processing
 ├── enhanced_embeddings.py        # ⚡ Enhanced processing
 ├── smart_rag_query.py            # Advanced query system
-├── setup_advanced_models.py      # Model setup script
+├── embedding_test.py             # Test script for embedding engine
 ├── requirements.txt              # Python dependencies
 ├── Procfile                      # Railway deployment config
 ├── railway.json                  # Railway settings
@@ -221,22 +210,14 @@ The app is configured for production with:
 
 ## 🔧 Architecture
 
-### Neural Processing Flow
-1. **Document Analysis**: AI-powered content understanding
-2. **Neural Chunking**: Transformer-based text segmentation
-3. **Hybrid Embeddings**: Multi-model embedding generation
-4. **Semantic Clustering**: Advanced ML grouping
-5. **Quality Prediction**: Real-time chunk scoring
-6. **FAISS Indexing**: Ultra-fast vector search
-7. **Knowledge Graphs**: Concept relationship mapping
-
-### Adaptive Learning
-1. **Content Analysis**: Complexity and readability scoring
-2. **Dynamic Sizing**: Adaptive chunk size optimization
-3. **Concept Extraction**: Advanced NLP processing
-4. **Quality Metrics**: Comprehensive scoring system
-5. **Parameter Learning**: Self-improving algorithms
-6. **Cross-Reference Detection**: Document linking
+### Centralized Processing Flow
+1. **Strategy Selection**: Choose processing level based on requirements
+2. **Document Analysis**: Content categorization and analysis
+3. **Smart Chunking**: Adaptive text segmentation
+4. **Embedding Generation**: Batch processing with retry logic
+5. **Quality Assessment**: Comprehensive chunk scoring
+6. **Supabase Upload**: Efficient batch uploads
+7. **Performance Tracking**: Detailed statistics and metrics
 
 ### Security Model
 1. **Frontend**: Collects user credentials securely
@@ -246,21 +227,21 @@ The app is configured for production with:
 
 ### Data Flow
 ```
-User Credentials → Neural Processing → Multi-Model Embeddings → Semantic Analysis → User's Supabase DB
+User Credentials → Centralized Engine → Strategy Processing → Quality Assessment → User's Supabase DB
                         ↓                      ↓                      ↓                    ↓
-                   AI Chunking          Hybrid Models         Advanced ML         Secure Storage
+                 Strategy Selection      Smart Chunking        Embedding Generation    Secure Storage
 ```
 
 ### Performance Optimizations
-- **Neural Chunking**: AI-powered segmentation with quality prediction
-- **Adaptive Sizing**: Dynamic optimization based on content complexity
-- **Hybrid Embeddings**: Multiple models for comprehensive understanding
+- **Pluggable Strategies**: Choose optimal processing level
+- **Smart Chunking**: Content-aware text segmentation
+- **Quality Scoring**: Advanced chunk assessment
 - **Batch Processing**: Efficient processing with intelligent grouping
-- **FAISS Indexing**: Ultra-fast similarity search
-- **Semantic Clustering**: Advanced ML grouping for better retrieval
+- **Retry Logic**: Robust error handling
+- **Content Categorization**: Automatic document classification
 - **Memory Management**: Automatic cleanup of temporary files
 - **Error Recovery**: Graceful handling of file processing errors
-- **Model Caching**: Optimized model loading and reuse
+- **Performance Tracking**: Comprehensive statistics
 
 ## 🛡️ Security Best Practices
 
@@ -280,44 +261,36 @@ User Credentials → Neural Processing → Multi-Model Embeddings → Semantic A
 
 ## 📊 Features
 
-### Neural Processing
-- **AI-Powered Chunking**: Neural networks determine optimal text segments
-- **Multi-Model Embeddings**: Combines OpenAI, Sentence Transformers, and contextual models
-- **Advanced Clustering**: HDBSCAN with UMAP for semantic grouping
-- **Quality Prediction**: Real-time ML-based chunk quality scoring
-- **FAISS Integration**: Ultra-fast vector similarity search
-- **Query Expansion**: Neural enhancement of search queries
-
-### Adaptive Intelligence
-- **Dynamic Optimization**: Self-adjusting parameters based on content
-- **Concept Graphs**: Knowledge relationship mapping with NetworkX
-- **Advanced NLP**: spaCy integration for entity and concept extraction
-- **Cross-Reference Detection**: Automatic document linking
-- **Quality Metrics**: Comprehensive readability and complexity analysis
-- **Learning Algorithms**: Parameters improve with each processing session
+### Centralized Processing
+- **Strategy Pattern**: Pluggable processing strategies
+- **Unified Configuration**: Single config object for all settings
+- **Content Categorization**: Automatic document type classification
+- **Quality Assessment**: Advanced chunk quality scoring
+- **Performance Tracking**: Comprehensive statistics and metrics
+- **Backward Compatibility**: Works with existing integrations
 
 ### Multi-Format Support
 - Intelligent text extraction from various file formats
-- Neural-powered content chunking with quality prediction
-- Adaptive sizing based on content complexity
+- Smart content chunking with quality prediction
+- Category-aware sizing based on content type
 - Metadata preservation for enhanced search
 - Error recovery for corrupted files
 
 ### Smart Processing
-- **Neural Chunking**: AI-powered text segmentation
-- **Adaptive Sizing**: Dynamic optimization based on content
-- **Hybrid Embeddings**: Multi-model approach for comprehensive understanding
+- **Smart Chunking**: Content-aware text segmentation
+- **Category-based Sizing**: Optimization based on content type
+- **Quality Scoring**: Advanced chunk assessment
 - **Text Cleaning**: Removes problematic characters and formatting
 - **Progress Tracking**: Real-time processing updates
-- **Semantic Clustering**: Advanced ML grouping
-- **Quality Prediction**: Real-time chunk scoring
+- **Content Analysis**: Automatic categorization and concept extraction
+- **Retry Logic**: Robust error handling
 
 ### User Experience
 - **Modern Web Interface**: Drag & drop file uploads
 - **Real-time Processing**: Live status updates
 - **Responsive Design**: Works on all devices
 - **Secure Credential Handling**: User-friendly credential input with validation
-- **Advanced Results**: Neural processing statistics and quality metrics
+- **Advanced Results**: Processing statistics and quality metrics
 - **Error Guidance**: Helpful troubleshooting tips
 - **Performance Insights**: Detailed processing analytics
 
@@ -345,13 +318,12 @@ User Credentials → Neural Processing → Multi-Model Embeddings → Semantic A
 
 ### Performance Metrics
 - Processing time tracking
-- Neural processing statistics
+- Strategy performance statistics
 - Quality distribution analysis
 - Embedding generation metrics
-- Clustering performance
 - Upload success rates
 - Error rate monitoring
-- Model performance optimization
+- Strategy usage tracking
 
 ## 🤝 Contributing
 
@@ -374,38 +346,36 @@ User Credentials → Neural Processing → Multi-Model Embeddings → Semantic A
 
 ```python
 # Basic usage
-from universal_file_processor import UniversalFileProcessor
+from embedding_engine import EmbeddingEngine, EmbeddingConfig, ProcessingLevel
 
-processor = UniversalFileProcessor()
-processor.openai_api_key = "your-key"
-processor.supabase_url = "your-url"
-processor.supabase_service_key = "your-service-key"
-
-chunks = processor.process_file("document.pdf")
-result = processor.upload_to_supabase(chunks)
-
-# Advanced neural processing
-from neural_embeddings import run_neural_processing
-
-result = await run_neural_processing(
-    chunks, api_key, supabase_url, service_key
+# Create configuration
+config = EmbeddingConfig(
+    processing_level=ProcessingLevel.INTELLIGENT,
+    chunk_size=800,
+    batch_size=50
 )
 
-# Adaptive processing
-from adaptive_embeddings import run_adaptive_processing
+# Create engine
+engine = EmbeddingEngine(config)
+engine.set_credentials(api_key, supabase_url, service_key)
 
-result = await run_adaptive_processing(
-    chunks, api_key, supabase_url, service_key
-)
+# Process documents
+documents = [{'content': text, 'source': 'file.pdf'}]
+result = await engine.process_documents(documents)
+
+# Get statistics
+stats = engine.get_stats()
 ```
 
 ## 🧪 Processing Levels
 
-The system automatically selects the best available processing level:
+The centralized engine supports multiple processing levels:
 
-1. **🧠 Neural** → **🎯 Adaptive** → **🔍 Intelligent** → **⚡ Enhanced** → **📝 Basic**
+1. **🔍 Intelligent** - Content categorization and smart chunking
+2. **⚡ Enhanced** - Batch processing with retry logic
+3. **📝 Basic** - Simple chunking (fallback)
 
-Each level provides increasingly sophisticated processing with better quality and performance.
+Choose the level based on your performance and quality requirements.
 
 ## 📄 License
 
@@ -420,8 +390,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - No data is stored on our servers
 - File size limit: 16MB per file
 - Supported formats: TXT, PDF, DOC, DOCX, CSV
-- **NEW**: Neural processing provides significantly better results
-- **NEW**: Adaptive learning improves quality over time
+- **NEW**: Centralized engine provides consistent, high-quality processing
+- **NEW**: Pluggable strategies for different use cases
 
 ### For Developers
 - Never store user credentials
@@ -430,12 +400,12 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Follow security best practices
 - Monitor resource usage in production
 - Implement rate limiting for high-traffic scenarios
-- **NEW**: Consider GPU acceleration for neural processing
-- **NEW**: Monitor model performance and quality metrics
+- **NEW**: Use centralized engine for consistent processing
+- **NEW**: Monitor strategy performance and quality metrics
 
 ---
 
-**Next-generation RAG processing with neural intelligence, secured by design** 🧠🔒
+**Next-generation RAG processing with centralized intelligence, secured by design** 🚀🔒
 
 ### Support
 
@@ -443,6 +413,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - 💬 Discussions: Use GitHub Discussions
 - 🔒 Security: Report security issues privately
 - 📖 Documentation: Check the README and code comments
-- 🧠 Neural Processing: See setup_advanced_models.py for configuration
+- 🚀 Centralized Engine: See embedding_test.py for examples
 
 ---
