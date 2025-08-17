@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Upload, FileText, Database, CheckCircle, AlertCircle, Loader2, Brain, Zap, Settings, Key, Shield } from 'lucide-react';
+import { Upload, FileText, Database, CheckCircle, AlertCircle, Loader2, Brain, Zap, Settings, Key, Shield, Download } from 'lucide-react';
 import { useLanguage } from './hooks/useLanguage';
 import { usePWA } from './hooks/usePWA';
 import FileUploader from './components/FileUploader.tsx';
