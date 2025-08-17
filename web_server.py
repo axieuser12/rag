@@ -17,6 +17,7 @@ from flask import send_from_directory
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from universal_file_processor import UniversalFileProcessor
+from smart_rag_query import run_smart_query
 
 # Configure logging
 logging.basicConfig(
@@ -416,6 +417,77 @@ def _process_files_internal():
             "message": "Error processing files",
             "error": str(e)
         })
+
+@app.route('/query', methods=['POST'])
+def smart_query():
+    """Handle intelligent RAG queries"""
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({
+                "success": False,
+                "message": "No JSON data provided"
+            }), 400
+        
+        question = data.get('question', '').strip()
+        if not question:
+            return jsonify({
+                "success": False,
+                "message": "Question is required"
+            }), 400
+        
+        # Extract credentials
+        credentials = {
+            'openai_api_key': data.get('openai_api_key', ''),
+            'supabase_url': data.get('supabase_url', ''),
+            'supabase_service_key': data.get('supabase_service_key', '')
+        }
+        
+        # Validate credentials
+        credential_errors = validate_credentials(credentials)
+        if credential_errors:
+            return jsonify({
+                "success": False,
+                "message": "Invalid credentials provided",
+                "error": "; ".join(credential_errors)
+            }), 400
+        
+        # Optional category filter
+        category_filter = data.get('category_filter')
+        
+        # Execute smart query
+        result = run_smart_query(
+            question=question,
+            openai_api_key=credentials['openai_api_key'],
+            supabase_url=credentials['supabase_url'],
+            supabase_service_key=credentials['supabase_service_key'],
+            category_filter=category_filter
+        )
+        
+        return jsonify({
+            "success": True,
+            "question": question,
+            "answer": result['answer'],
+            "confidence": result['confidence'],
+            "sources": result['sources'],
+            "context_used": result['context_used'],
+            "query_analysis": result['query_analysis'],
+            "retrieval_stats": result['retrieval_stats']
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in smart query: {e}")
+        return jsonify({
+            "success": False,
+            "message": "Error processing query",
+            "error": str(e)
+        }), 500
+
+@app.route('/api/query', methods=['POST'])
+def api_smart_query():
+    """API endpoint for smart queries"""
+    return smart_query()
 
 # Static file serving for production
 @app.route('/assets/<path:path>')

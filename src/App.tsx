@@ -21,6 +21,7 @@ import ResultsDisplay from './components/ResultsDisplay.tsx';
 import CredentialsForm from './components/CredentialsForm.tsx';
 import SqlSetupModal from './components/SqlSetupModal.tsx';
 import PWAInstallButton from './components/PWAInstallButton.tsx';
+import QueryInterface from './components/QueryInterface.tsx';
 
 // Add install button in header
 const InstallButton: React.FC = () => {
@@ -303,6 +304,9 @@ function App() {
             {result && (
               <ResultsDisplay result={result} />
             )}
+
+            {/* Query Interface */}
+            <QueryInterface credentials={credentials} />
 
             {/* Features */}
             <div className="grid md:grid-cols-4 gap-6">

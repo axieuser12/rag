@@ -6,6 +6,7 @@ import chardet
 from pathlib import Path
 from typing import List, Dict, Any
 from enhanced_embeddings import run_enhanced_processing, EnhancedEmbeddingProcessor
+from intelligent_embeddings import run_intelligent_processing, SmartRetriever
 
 # Simple text splitter implementation
 class SimpleTextSplitter:
@@ -330,7 +331,34 @@ class UniversalFileProcessor:
         """Upload all chunks to Supabase with embeddings"""
         print("Starting upload to Supabase...")
         
-        # Use enhanced processing if available
+        # Try intelligent processing first (best quality)
+        try:
+            print("Using intelligent embedding processing with categorization...")
+            result = run_intelligent_processing(
+                chunks, 
+                self.openai_api_key, 
+                self.supabase_url, 
+                self.supabase_service_key
+            )
+            
+            # Convert to expected format
+            return {
+                'successful_uploads': result['upload_stats']['successful_uploads'],
+                'failed_uploads': result['upload_stats']['failed_uploads'],
+                'embedding_errors': result.get('failed_embeddings', 0),
+                'total_chunks': result['chunks_processed'],
+                'intelligent_chunks_created': result['intelligent_chunks_created'],
+                'high_quality_chunks': result['upload_stats']['high_quality_chunks'],
+                'semantic_clusters': result['upload_stats']['semantic_clusters'],
+                'performance_stats': result.get('performance_stats', {})
+            }
+            
+        except Exception as e:
+            print(f"Intelligent processing failed, falling back to enhanced: {e}")
+            # Fall back to enhanced processing
+            pass
+        
+        # Use enhanced processing if intelligent fails
         try:
             print("Using enhanced batch processing...")
             result = run_enhanced_processing(
