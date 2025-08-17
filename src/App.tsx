@@ -1,11 +1,56 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Upload, FileText, Database, CheckCircle, AlertCircle, Loader2, Brain, Zap, Settings, Key, Shield } from 'lucide-react';
+import { 
+  Upload, 
+  FileText, 
+  Database, 
+  CheckCircle, 
+  AlertCircle, 
+  Loader2, 
+  Brain, 
+  Zap, 
+  Settings, 
+  Key, 
+  Shield, 
+  Download 
+} from 'lucide-react';
 import { useLanguage } from './hooks/useLanguage';
+import { usePWA } from './hooks/usePWA';
 import FileUploader from './components/FileUploader.tsx';
 import ProcessingStatus from './components/ProcessingStatus.tsx';
 import ResultsDisplay from './components/ResultsDisplay.tsx';
 import CredentialsForm from './components/CredentialsForm.tsx';
 import SqlSetupModal from './components/SqlSetupModal.tsx';
+import PWAInstallButton from './components/PWAInstallButton.tsx';
+import QueryInterface from './components/QueryInterface.tsx';
+
+// Add install button in header
+const InstallButton: React.FC = () => {
+  const { t } = useLanguage();
+  const [showInstall, setShowInstall] = useState(false);
+
+  const handleInstallClick = () => {
+    setShowInstall(true);
+  };
+
+  const handleInstallSuccess = () => {
+    setShowInstall(false);
+  };
+
+  return (
+    <>
+      <button
+        onClick={handleInstallClick}
+        className="flex items-center px-4 py-2 text-sm bg-white/10 text-white rounded-lg hover:bg-white/20 border border-white/20 transition-colors"
+      >
+        <Download className="w-4 h-4 mr-2" />
+        {t('installApp')}
+      </button>
+      {showInstall && (
+        <PWAInstallButton onInstall={handleInstallSuccess} />
+      )}
+    </>
+  );
+};
 
 interface ProcessingResult {
   success: boolean;
@@ -30,6 +75,7 @@ interface Credentials {
 
 function App() {
   const { t } = useLanguage();
+  const { isStandalone } = usePWA();
   const [files, setFiles] = useState<File[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<ProcessingResult | null>(null);
@@ -121,6 +167,11 @@ function App() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
+          {/* Install Button in Header */}
+          <div className="flex justify-end mb-4">
+            <InstallButton />
+          </div>
+          
           <div className="flex items-center justify-center mb-6">
             <div className="p-4 rounded-full glass-effect-dark">
               <img 
@@ -254,6 +305,9 @@ function App() {
               <ResultsDisplay result={result} />
             )}
 
+            {/* Query Interface */}
+            <QueryInterface credentials={credentials} />
+
             {/* Features */}
             <div className="grid md:grid-cols-4 gap-6">
               <div className="glass-effect-dark rounded-xl p-6 text-center">
@@ -284,6 +338,9 @@ function App() {
         </div>
       </div>
 
+      {/* PWA Install Button */}
+      <PWAInstallButton onInstall={() => console.log('App installed!')} />
+
       {/* Credentials Modal */}
       {showCredentials && (
         <CredentialsForm
@@ -295,7 +352,10 @@ function App() {
 
       {/* SQL Setup Modal */}
       {showSqlSetup && (
-        <SqlSetupModal onClose={() => setShowSqlSetup(false)} />
+        <SqlSetupModal 
+          onClose={() => setShowSqlSetup(false)} 
+          credentials={credentials}
+        />
       )}
     </div>
   );
