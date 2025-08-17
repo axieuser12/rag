@@ -33,7 +33,7 @@ asyncio-throttle==1.0.2
 scikit-learn==1.3.0
 scipy==1.11.1
 
-# Advanced Neural Processing
+# Advanced Neural Processing (Now Core Features!)
 torch==2.0.1
 transformers==4.30.0
 sentence-transformers==2.2.2
