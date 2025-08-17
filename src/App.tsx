@@ -352,7 +352,10 @@ function App() {
 
       {/* SQL Setup Modal */}
       {showSqlSetup && (
-        <SqlSetupModal onClose={() => setShowSqlSetup(false)} />
+        <SqlSetupModal 
+          onClose={() => setShowSqlSetup(false)} 
+          credentials={credentials}
+        />
       )}
     </div>
   );
