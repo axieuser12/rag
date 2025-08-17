@@ -17,8 +17,17 @@ import tiktoken
 from openai import OpenAI
 from supabase import create_client
 
+# Import the new neural core
+try:
+    from neural_core import get_neural_core, NeuralConfig, ProcessingMode, run_neural_supreme_processing
+    NEURAL_CORE_AVAILABLE = True
+except ImportError:
+    NEURAL_CORE_AVAILABLE = False
+    print("⚠️  Neural core not available - using standard processing")
+
 class ProcessingLevel(Enum):
     """Available processing levels"""
+    NEURAL_SUPREME = "neural_supreme"  # NEW: Ultimate neural processing
     NEURAL = "neural"
     ADAPTIVE = "adaptive"
     INTELLIGENT = "intelligent"
@@ -494,6 +503,13 @@ class EmbeddingEngine:
     
     def _create_strategy(self) -> EmbeddingStrategy:
         """Create embedding strategy based on configuration"""
+        if self.config.processing_level == ProcessingLevel.NEURAL_SUPREME:
+            if NEURAL_CORE_AVAILABLE:
+                # Use neural core for supreme processing
+                return NeuralSupremeStrategy(self.config)
+            else:
+                print("⚠️  Neural Supreme not available, falling back to Intelligent")
+                return IntelligentEmbeddingStrategy(self.config)
         if self.config.processing_level == ProcessingLevel.INTELLIGENT:
             return IntelligentEmbeddingStrategy(self.config)
         elif self.config.processing_level == ProcessingLevel.ENHANCED:
@@ -501,6 +517,53 @@ class EmbeddingEngine:
         else:
             return BasicEmbeddingStrategy(self.config)
     
+class NeuralSupremeStrategy(EmbeddingStrategy):
+    """Neural Supreme strategy using the advanced neural core"""
+    
+    def __init__(self, config: EmbeddingConfig):
+        super().__init__(config)
+        self.neural_config = NeuralConfig(
+            processing_mode=ProcessingMode.NEURAL_SUPREME,
+            batch_size=config.batch_size,
+            max_chunk_size=config.chunk_size,
+            overlap_ratio=config.chunk_overlap / config.chunk_size,
+            quality_threshold=config.quality_threshold
+        )
+        self.neural_core = get_neural_core(self.neural_config)
+    
+    def get_strategy_name(self) -> str:
+        return "neural_supreme"
+    
+    async def create_chunks(self, text: str, source: str) -> List[Dict[str, Any]]:
+        """Create chunks using neural core"""
+        chunks = await self.neural_core.neural_chunk_analysis(text, source)
+        self.stats['chunks_processed'] += len(chunks)
+        return chunks
+    
+    async def generate_embeddings(self, chunks: List[Dict[str, Any]], openai_client: OpenAI) -> List[Tuple[Dict[str, Any], Optional[List[float]]]]:
+        """Generate embeddings using neural core"""
+        # Set credentials in neural core
+        if hasattr(self.neural_core, 'openai_client'):
+            self.neural_core.openai_client = openai_client
+        
+        # Generate embeddings with caching and fusion
+        results = []
+        for chunk in chunks:
+            try:
+                embeddings_dict = await self.neural_core.generate_hybrid_embeddings(chunk['content'])
+                if embeddings_dict:
+                    fused_embedding, quality = self.neural_core.embedding_fusion.fuse_embeddings(embeddings_dict)
+                    # Update chunk with quality info
+                    chunk['neural_features']['fusion_quality'] = quality
+                    results.append((chunk, fused_embedding.tolist()))
+                    self.stats['embeddings_generated'] += 1
+                else:
+                    results.append((chunk, None))
+            except Exception as e:
+                print(f"Neural embedding failed: {e}")
+                results.append((chunk, None))
+        
+        return results
     def set_credentials(self, openai_api_key: str, supabase_url: str, supabase_service_key: str):
         """Set user credentials"""
         self.openai_client = OpenAI(api_key=openai_api_key)
@@ -649,6 +712,15 @@ class EmbeddingEngine:
         }
 
 # Convenience functions for backward compatibility
+async def run_neural_supreme_processing_compat(chunks: List[Dict[str, Any]], openai_api_key: str, 
+                                             supabase_url: str, supabase_service_key: str) -> Dict[str, Any]:
+    """Run neural supreme processing (compatibility wrapper)"""
+    if NEURAL_CORE_AVAILABLE:
+        return await run_neural_supreme_processing(chunks, openai_api_key, supabase_url, supabase_service_key)
+    else:
+        # Fallback to intelligent processing
+        return await run_intelligent_processing(chunks, openai_api_key, supabase_url, supabase_service_key)
+
 async def run_basic_processing(chunks: List[Dict[str, Any]], openai_api_key: str, 
                              supabase_url: str, supabase_service_key: str) -> Dict[str, Any]:
     """Run basic processing"""
@@ -711,10 +783,14 @@ async def run_intelligent_processing(chunks: List[Dict[str, Any]], openai_api_ke
 
 if __name__ == "__main__":
     print("🚀 Centralized Embedding Engine")
+    if NEURAL_CORE_AVAILABLE:
+        print("🧠 NEURAL SUPREME MODE AVAILABLE!")
     print("Available processing levels:")
     for level in ProcessingLevel:
         print(f"  - {level.value}")
     print("\nUsage:")
     print("  from embedding_engine import EmbeddingEngine, EmbeddingConfig, ProcessingLevel")
+    if NEURAL_CORE_AVAILABLE:
+        print("  config = EmbeddingConfig(processing_level=ProcessingLevel.NEURAL_SUPREME)")
     print("  config = EmbeddingConfig(processing_level=ProcessingLevel.INTELLIGENT)")
     print("  engine = EmbeddingEngine(config)")
