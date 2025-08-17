@@ -5,7 +5,6 @@ export interface Language {
 }
 
 export const languages: Language[] = [
-  { code: 'sv', name: 'Svenska', flag: '🇸🇪' },
   { code: 'en', name: 'English', flag: '🇺🇸' }
 ];
 
@@ -16,77 +15,6 @@ export interface Translations {
 }
 
 export const translations: Translations = {
-  sv: {
-    // Header
-    title: 'Axie Studio RAG Filbehandlare',
-    subtitle: 'Ladda upp dina dokument och skapa en sökbar kunskapsbas med dina egna OpenAI och Supabase-uppgifter',
-    
-    // Credentials
-    credentialsConfigured: 'Uppgifter konfigurerade ✓',
-    credentialsRequired: 'Uppgifter krävs',
-    changeCredentials: 'Ändra uppgifter',
-    setupCredentials: 'Konfigurera',
-    updateCredentials: 'Uppdatera',
-    
-    // File Upload
-    uploadFiles: 'Ladda upp filer',
-    dragDropFiles: 'Dra och släpp filer här, eller klicka för att bläddra',
-    supportedFormats: 'Format som stöds: TXT, PDF, DOC, DOCX, CSV (Max 16MB per fil)',
-    selectedFiles: 'Valda filer:',
-    processFiles: 'Bearbeta filer',
-    processing: 'Bearbetar...',
-    clearAll: 'Rensa alla',
-    fileLimitReached: 'Maxgräns nådd (5 filer)',
-    fileLimitWarning: 'Du kan bearbeta maximalt 5 filer åt gången',
-    
-    // Processing Status
-    processingFiles: 'Bearbetar filer',
-    pleaseWait: 'Vänta medan vi bearbetar dina filer och skapar inbäddningar...',
-    extractingText: 'Extraherar text',
-    readingContents: 'Läser filinnehåll',
-    creatingEmbeddings: 'Skapar inbäddningar',
-    usingOpenAI: 'Använder OpenAI API',
-    storingData: 'Lagrar data',
-    uploadingSupabase: 'Laddar upp till Supabase',
-    processingTime: 'Denna process kan ta några minuter beroende på filstorlek och antal filer',
-    
-    // Results
-    processingComplete: 'Bearbetning klar!',
-    processingFailed: 'Bearbetning misslyckades',
-    filesProcessed: 'Filer bearbetade',
-    chunksCreated: 'Delar skapade',
-    uploadedToSupabase: 'Uppladdade till Supabase',
-    
-    // Features
-    secure: 'Säker',
-    secureDesc: 'Dina uppgifter lagras aldrig på våra servrar',
-    multipleFormats: 'Flera format',
-    multipleFormatsDesc: 'Stöd för TXT, PDF, Word och CSV-filer',
-    yourDatabase: 'Din databas',
-    yourDatabaseDesc: 'Data lagras i din egen Supabase-instans',
-    aiPowered: 'AI-driven',
-    aiPoweredDesc: 'Smart bearbetning med din OpenAI API',
-    
-    // Credentials Form
-    configureCredentials: 'Konfigurera uppgifter',
-    credentialsSecure: 'Dina uppgifter är säkra',
-    credentialsNotStored: 'Uppgifter används endast för denna session och lagras aldrig på våra servrar. De skickas direkt till dina egna OpenAI och Supabase-tjänster.',
-    openaiApiKey: 'OpenAI API-nyckel',
-    supabaseProjectUrl: 'Supabase projekt-URL',
-    supabaseServiceKey: 'Supabase tjänstnyckel',
-    saveCredentials: 'Spara uppgifter',
-    cancel: 'Avbryt',
-    
-    // Errors and validation
-    credentialsBeforeProcessing: 'Vänligen konfigurera dina uppgifter innan du bearbetar filer',
-    
-    // Quick setup guide
-    quickSetupGuide: 'Snabb installationsguide:',
-    setupStep1: 'Skapa ett OpenAI-konto och generera en API-nyckel',
-    setupStep2: 'Skapa ett Supabase-projekt och aktivera pgvector-tillägget i SQL Editor',
-    setupStep3: 'Kör SQL-schemat från resultatsidan för att skapa dokumenttabellen',
-    setupStep4: 'Kopiera din projekt-URL och tjänstnyckel från Supabase-inställningar'
-  },
   en: {
     // Header
     title: 'Axie Studio RAG File Processor',
@@ -156,6 +84,53 @@ export const translations: Translations = {
     setupStep1: 'Create an OpenAI account and generate an API key',
     setupStep2: 'Create a Supabase project and enable the pgvector extension in SQL Editor',
     setupStep3: 'Run the SQL schema from the results page to create the documents table',
-    setupStep4: 'Copy your project URL and service role key from Supabase settings'
+    setupStep4: 'Copy your project URL and service role key from Supabase settings',
+    
+    // SQL Setup Modal
+    sqlSetup: 'SQL Setup',
+    sqlSetupTitle: 'Supabase Database Setup',
+    setupInstructions: 'Setup Instructions:',
+    sqlStep1: 'Open your Supabase dashboard and navigate to SQL Editor',
+    sqlStep2: 'Copy the SQL commands below',
+    sqlStep3: 'Paste and run the commands in SQL Editor',
+    sqlStep4: 'Verify that the "documents" table was created under Database > Tables',
+    openSupabaseDashboard: 'Open Supabase Dashboard',
+    sqlCommands: 'SQL Commands:',
+    copySQL: 'Copy SQL',
+    copied: 'Copied!',
+    close: 'Close',
+    whatThisCreates: 'What this creates:',
+    documentsTable: 'Documents Table',
+    documentsTableDesc: 'Stores your documents with vector embeddings',
+    vectorIndex: 'Vector Index',
+    vectorIndexDesc: 'Enables fast semantic search',
+    searchFunction: 'Search Function',
+    searchFunctionDesc: 'Ready-to-use function for finding similar documents',
+    performanceIndexes: 'Performance Indexes',
+    performanceIndexesDesc: 'Optimizes queries on source and date',
+    important: 'Important',
+    pgvectorWarning: 'Make sure the pgvector extension is enabled in your Supabase instance before running these commands.',
+    
+    // Auto setup
+    autoSetup: 'Auto Setup',
+    autoSetupAvailable: 'Automatic Setup Available',
+    autoSetupDescription: 'Since you have configured your Supabase credentials, you can use the "Auto Setup" button to automatically execute these SQL commands in your database.',
+    manualSetupRequired: 'Manual Setup Required',
+    manualSetupDescription: 'Configure your Supabase credentials first to enable automatic database setup.',
+    executing: 'Executing...',
+    setupSuccess: 'Database setup completed successfully! Your RAG system is ready to use.',
+    setupError: 'Failed to setup database automatically',
+    
+    // PWA
+    installApp: 'Install App',
+    installNow: 'Install Now',
+    installLater: 'Later',
+    installPrompt: 'Install Axie Studio RAG for quick access and offline functionality.',
+    iosInstallInstructions: 'Install this app on your iPhone: tap the Share button and then "Add to Home Screen".',
+    
+    // Additional PWA translations
+    downloadApp: 'Download App',
+    installForOffline: 'Install for offline access',
+    appInstalled: 'App installed successfully!'
   }
 };

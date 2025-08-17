@@ -78,7 +78,7 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="glass-effect rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="glass-effect-dark rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-white/20">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
             <Key className="w-6 h-6 text-white mr-3" />
@@ -93,12 +93,12 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
         </div>
 
         {/* Security Notice */}
-        <div className="mb-6 p-4 bg-green-500/20 border border-green-400/30 rounded-lg">
+        <div className="mb-6 p-4 bg-gray-800/50 border border-white/20 rounded-lg">
           <div className="flex items-start">
-            <Shield className="w-5 h-5 text-green-400 mr-3 mt-0.5" />
+            <Shield className="w-5 h-5 text-white mr-3 mt-0.5" />
             <div>
-              <p className="text-green-200 font-medium">{t('credentialsSecure')}</p>
-              <p className="text-green-100 text-sm mt-1">{t('credentialsNotStored')}</p>
+              <p className="text-white/90 font-medium">{t('credentialsSecure')}</p>
+              <p className="text-white/80 text-sm mt-1">{t('credentialsNotStored')}</p>
             </div>
           </div>
         </div>
@@ -113,7 +113,7 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
                 href="https://platform.openai.com/api-keys"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="ml-2 text-blue-300 hover:text-blue-200"
+                className="ml-2 text-white/70 hover:text-white"
               >
                 <ExternalLink className="w-4 h-4" />
               </a>
@@ -125,7 +125,7 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
                 onChange={(e) => handleInputChange('openai_api_key', e.target.value)}
                 placeholder="sk-proj-..."
                 className={`w-full p-3 pr-12 bg-white/10 border rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 ${
-                  errors.openai_api_key ? 'border-red-400' : 'border-white/30'
+                  errors.openai_api_key ? 'border-white/50' : 'border-white/20'
                 }`}
               />
               <button
@@ -137,7 +137,7 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
               </button>
             </div>
             {errors.openai_api_key && (
-              <p className="text-red-300 text-sm mt-1 flex items-center">
+              <p className="text-white/80 text-sm mt-1 flex items-center">
                 <AlertCircle className="w-4 h-4 mr-1" />
                 {errors.openai_api_key}
               </p>
@@ -156,7 +156,7 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
                 href="https://supabase.com/dashboard"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="ml-2 text-blue-300 hover:text-blue-200"
+                className="ml-2 text-white/70 hover:text-white"
               >
                 <ExternalLink className="w-4 h-4" />
               </a>
@@ -167,11 +167,11 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
               onChange={(e) => handleInputChange('supabase_url', e.target.value)}
               placeholder="https://your-project.supabase.co"
               className={`w-full p-3 bg-white/10 border rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 ${
-                errors.supabase_url ? 'border-red-400' : 'border-white/30'
+                errors.supabase_url ? 'border-white/50' : 'border-white/20'
               }`}
             />
             {errors.supabase_url && (
-              <p className="text-red-300 text-sm mt-1 flex items-center">
+              <p className="text-white/80 text-sm mt-1 flex items-center">
                 <AlertCircle className="w-4 h-4 mr-1" />
                 {errors.supabase_url}
               </p>
@@ -190,7 +190,7 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
                 href="https://supabase.com/dashboard"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="ml-2 text-blue-300 hover:text-blue-200"
+                className="ml-2 text-white/70 hover:text-white"
               >
                 <ExternalLink className="w-4 h-4" />
               </a>
@@ -202,7 +202,7 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
                 onChange={(e) => handleInputChange('supabase_service_key', e.target.value)}
                 placeholder="eyJ..."
                 className={`w-full p-3 pr-12 bg-white/10 border rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 ${
-                  errors.supabase_service_key ? 'border-red-400' : 'border-white/30'
+                  errors.supabase_service_key ? 'border-white/50' : 'border-white/20'
                 }`}
               />
               <button
@@ -214,7 +214,7 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
               </button>
             </div>
             {errors.supabase_service_key && (
-              <p className="text-red-300 text-sm mt-1 flex items-center">
+              <p className="text-white/80 text-sm mt-1 flex items-center">
                 <AlertCircle className="w-4 h-4 mr-1" />
                 {errors.supabase_service_key}
               </p>
@@ -225,9 +225,9 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
           </div>
 
           {/* Setup Instructions */}
-          <div className="p-4 bg-blue-500/20 border border-blue-400/30 rounded-lg">
-            <h3 className="text-blue-200 font-medium mb-2">{t('quickSetupGuide')}</h3>
-            <ol className="text-blue-100 text-sm space-y-1 list-decimal list-inside">
+          <div className="p-4 bg-gray-800/50 border border-white/20 rounded-lg">
+            <h3 className="text-white/90 font-medium mb-2">{t('quickSetupGuide')}</h3>
+            <ol className="text-white/80 text-sm space-y-1 list-decimal list-inside">
               <li>{t('setupStep1')}</li>
               <li>{t('setupStep2')}</li>
               <li>{t('setupStep3')}</li>
@@ -239,14 +239,14 @@ const CredentialsForm: React.FC<CredentialsFormProps> = ({
           <div className="flex gap-4 pt-4">
             <button
               type="submit"
-              className="flex-1 bg-white text-purple-600 py-3 px-6 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+              className="flex-1 btn-primary py-3 px-6 rounded-lg font-semibold transition-colors"
             >
               {t('saveCredentials')}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 border border-white/30 text-white rounded-lg font-semibold hover:bg-white/10 transition-colors"
+              className="px-6 py-3 btn-secondary rounded-lg font-semibold transition-colors"
             >
               {t('cancel')}
             </button>

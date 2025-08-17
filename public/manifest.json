@@ -1,0 +1,90 @@
+{
+  "name": "Axie Studio RAG File Processor",
+  "short_name": "Axie RAG",
+  "description": "Upload your documents and create a searchable knowledge base using your own OpenAI and Supabase credentials",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#1a1a1a",
+  "orientation": "portrait-primary",
+  "categories": ["productivity", "utilities", "business"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "https://www.axiestudio.se/Axiestudiologo.jpg",
+      "sizes": "36x36",
+      "type": "image/jpeg",
+      "density": "0.75"
+    },
+    {
+      "src": "https://www.axiestudio.se/Axiestudiologo.jpg",
+      "sizes": "48x48",
+      "type": "image/jpeg",
+      "density": "1.0"
+    },
+    {
+      "src": "https://www.axiestudio.se/Axiestudiologo.jpg",
+      "sizes": "72x72",
+      "type": "image/jpeg",
+      "density": "1.5"
+    },
+    {
+      "src": "https://www.axiestudio.se/Axiestudiologo.jpg",
+      "sizes": "96x96",
+      "type": "image/jpeg",
+      "density": "2.0"
+    },
+    {
+      "src": "https://www.axiestudio.se/Axiestudiologo.jpg",
+      "sizes": "144x144",
+      "type": "image/jpeg",
+      "density": "3.0"
+    },
+    {
+      "src": "https://www.axiestudio.se/Axiestudiologo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "density": "4.0",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "https://www.axiestudio.se/Axiestudiologo.jpg",
+      "sizes": "180x180",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "https://www.axiestudio.se/Axiestudiologo.jpg",
+      "sizes": "310x310",
+      "type": "image/jpeg"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshot-narrow.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Upload Files",
+      "short_name": "Upload",
+      "description": "Upload and process documents",
+      "url": "/?action=upload",
+      "icons": [
+        {
+          "src": "https://www.axiestudio.se/Axiestudiologo.jpg",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}
