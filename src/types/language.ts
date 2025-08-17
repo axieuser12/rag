@@ -111,6 +111,16 @@ export const translations: Translations = {
     important: 'Important',
     pgvectorWarning: 'Make sure the pgvector extension is enabled in your Supabase instance before running these commands.',
     
+    // Auto setup
+    autoSetup: 'Auto Setup',
+    autoSetupAvailable: 'Automatic Setup Available',
+    autoSetupDescription: 'Since you have configured your Supabase credentials, you can use the "Auto Setup" button to automatically execute these SQL commands in your database.',
+    manualSetupRequired: 'Manual Setup Required',
+    manualSetupDescription: 'Configure your Supabase credentials first to enable automatic database setup.',
+    executing: 'Executing...',
+    setupSuccess: 'Database setup completed successfully! Your RAG system is ready to use.',
+    setupError: 'Failed to setup database automatically',
+    
     // PWA
     installApp: 'Install App',
     installNow: 'Install Now',

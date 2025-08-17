@@ -10,6 +10,7 @@ import tempfile
 import shutil
 import logging
 import traceback
+import asyncio
 from pathlib import Path
 from typing import Dict, Any
 from flask import Flask, request, jsonify
@@ -18,6 +19,7 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from universal_file_processor import UniversalFileProcessor
 from smart_rag_query import run_smart_query
+from supabase import create_client
 
 # Configure logging
 logging.basicConfig(
@@ -488,6 +490,138 @@ def smart_query():
 def api_smart_query():
     """API endpoint for smart queries"""
     return smart_query()
+
+@app.route('/setup-database', methods=['POST'])
+def setup_database():
+    """Automatically setup Supabase database with required schema"""
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({
+                "success": False,
+                "message": "No JSON data provided"
+            }), 400
+        
+        # Extract credentials
+        supabase_url = data.get('supabase_url', '').strip()
+        supabase_service_key = data.get('supabase_service_key', '').strip()
+        sql_commands = data.get('sql_commands', '').strip()
+        
+        if not supabase_url or not supabase_service_key:
+            return jsonify({
+                "success": False,
+                "message": "Supabase URL and service key are required"
+            }), 400
+        
+        if not sql_commands:
+            return jsonify({
+                "success": False,
+                "message": "SQL commands are required"
+            }), 400
+        
+        # Validate Supabase URL format
+        if 'supabase.co' not in supabase_url:
+            return jsonify({
+                "success": False,
+                "message": "Invalid Supabase URL format"
+            }), 400
+        
+        # Validate service key format
+        if not supabase_service_key.startswith('eyJ'):
+            return jsonify({
+                "success": False,
+                "message": "Invalid Supabase service key format"
+            }), 400
+        
+        logger.info("Attempting to setup Supabase database schema")
+        
+        try:
+            # Create Supabase client
+            supabase = create_client(supabase_url, supabase_service_key)
+            
+            # Split SQL commands by semicolon and execute each one
+            commands = [cmd.strip() for cmd in sql_commands.split(';') if cmd.strip()]
+            
+            executed_commands = 0
+            for command in commands:
+                if command and not command.startswith('--'):  # Skip comments
+                    try:
+                        # Execute SQL command
+                        result = supabase.rpc('exec_sql', {'sql': command}).execute()
+                        executed_commands += 1
+                        logger.info(f"Executed SQL command successfully")
+                    except Exception as cmd_error:
+                        # Try alternative method for SQL execution
+                        try:
+                            # Use the SQL editor endpoint if available
+                            response = supabase.postgrest.session.post(
+                                f"{supabase_url}/rest/v1/rpc/exec_sql",
+                                json={"sql": command},
+                                headers={
+                                    "apikey": supabase_service_key,
+                                    "Authorization": f"Bearer {supabase_service_key}",
+                                    "Content-Type": "application/json"
+                                }
+                            )
+                            if response.status_code == 200:
+                                executed_commands += 1
+                                logger.info(f"Executed SQL command via REST API")
+                            else:
+                                logger.warning(f"SQL command failed via REST API: {response.text}")
+                        except Exception as rest_error:
+                            logger.warning(f"Failed to execute SQL command: {cmd_error}, REST fallback: {rest_error}")
+                            # Continue with other commands
+                            continue
+            
+            if executed_commands == 0:
+                return jsonify({
+                    "success": False,
+                    "message": "No SQL commands could be executed. Your Supabase instance might not support direct SQL execution via API.",
+                    "error": "Please run the SQL commands manually in your Supabase SQL Editor"
+                })
+            
+            # Verify that the documents table was created
+            try:
+                test_query = supabase.table('documents').select('id').limit(1).execute()
+                logger.info("Verified documents table exists")
+                
+                return jsonify({
+                    "success": True,
+                    "message": f"Database setup completed successfully! Executed {executed_commands} SQL commands. Your RAG system is ready to use.",
+                    "commands_executed": executed_commands
+                })
+                
+            except Exception as verify_error:
+                logger.warning(f"Could not verify table creation: {verify_error}")
+                return jsonify({
+                    "success": True,
+                    "message": f"SQL commands executed ({executed_commands} commands), but could not verify table creation. Please check your Supabase dashboard.",
+                    "commands_executed": executed_commands,
+                    "warning": "Table verification failed"
+                })
+        
+        except Exception as supabase_error:
+            logger.error(f"Supabase connection or execution error: {supabase_error}")
+            return jsonify({
+                "success": False,
+                "message": "Failed to connect to Supabase or execute SQL commands",
+                "error": str(supabase_error),
+                "suggestion": "Please verify your credentials and try running the SQL commands manually in Supabase SQL Editor"
+            })
+        
+    except Exception as e:
+        logger.error(f"Error in setup_database: {e}")
+        return jsonify({
+            "success": False,
+            "message": "Error setting up database",
+            "error": str(e)
+        }), 500
+
+@app.route('/api/setup-database', methods=['POST'])
+def api_setup_database():
+    """API endpoint for database setup"""
+    return setup_database()
 
 # Static file serving for production
 @app.route('/assets/<path:path>')
