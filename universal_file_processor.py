@@ -5,6 +5,8 @@ import tiktoken
 import chardet
 from pathlib import Path
 from typing import List, Dict, Any
+from embedding_engine import EmbeddingEngine, EmbeddingConfig, ProcessingLevel
+from embedding_engine import run_enhanced_processing, run_intelligent_processing, run_neural_supreme_processing_compat
 
 # Simple text splitter implementation
 class SimpleTextSplitter:
@@ -329,6 +331,109 @@ class UniversalFileProcessor:
         """Upload all chunks to Supabase with embeddings"""
         print("Starting upload to Supabase...")
         
+        # Use centralized embedding engine with intelligent processing
+        try:
+            print("Using centralized embedding engine with NEURAL SUPREME processing...")
+            
+            # Create engine with neural supreme processing
+            config = EmbeddingConfig(processing_level=ProcessingLevel.NEURAL_SUPREME)
+            engine = EmbeddingEngine(config)
+            engine.set_credentials(self.openai_api_key, self.supabase_url, self.supabase_service_key)
+            
+            # Convert chunks to documents format
+            documents = [{'content': chunk['content'], 'source': chunk['source']} for chunk in chunks]
+            
+            # Process documents
+            result = asyncio.run(engine.process_documents(documents))
+            
+            return {
+                'successful_uploads': result.successful_embeddings,
+                'failed_uploads': result.failed_embeddings,
+                'embedding_errors': result.failed_embeddings,
+                'total_chunks': result.chunks_processed,
+                'processing_level': result.processing_level,
+                'performance_stats': result.performance_stats
+            }
+            
+        except Exception as e:
+            print(f"Neural Supreme processing failed, trying direct neural core: {e}")
+            
+        # Try direct neural core processing
+        try:
+            print("Using direct neural core processing...")
+            result = asyncio.run(run_neural_supreme_processing_compat(
+                chunks, 
+                self.openai_api_key, 
+                self.supabase_url, 
+                self.supabase_service_key
+            ))
+            
+            # Convert to expected format
+            return {
+                'successful_uploads': result.get('successful_embeddings', 0),
+                'failed_uploads': result.get('failed_embeddings', 0),
+                'embedding_errors': result.get('failed_embeddings', 0),
+                'total_chunks': result.get('chunks_created', 0),
+                'processing_level': 'neural_supreme',
+                'neural_stats': result.get('neural_stats', {}),
+                'performance_stats': result.get('performance_stats', {})
+            }
+            
+        except Exception as e:
+            print(f"Direct neural core failed, falling back to intelligent: {e}")
+            
+        # Fallback to original intelligent processing
+        try:
+            print("Using fallback intelligent processing...")
+            result = asyncio.run(run_intelligent_processing(
+                chunks, 
+                self.openai_api_key, 
+                self.supabase_url, 
+                self.supabase_service_key
+            ))
+            
+            # Convert to expected format
+            return {
+                'successful_uploads': result['upload_stats']['successful_uploads'],
+                'failed_uploads': result['upload_stats']['failed_uploads'],
+                'embedding_errors': result.get('failed_embeddings', 0),
+                'total_chunks': result['chunks_processed'],
+                'intelligent_chunks_created': result['intelligent_chunks_created'],
+                'high_quality_chunks': result['upload_stats']['high_quality_chunks'],
+                'semantic_clusters': result['upload_stats']['semantic_clusters'],
+                'performance_stats': result.get('performance_stats', {})
+            }
+            
+        except Exception as e:
+            print(f"Intelligent processing failed, falling back to enhanced: {e}")
+            # Fall back to enhanced batch processing
+            pass
+        
+        # Use enhanced batch processing
+        try:
+            print("Using enhanced batch processing...")
+            result = asyncio.run(run_enhanced_processing(
+                chunks, 
+                self.openai_api_key, 
+                self.supabase_url, 
+                self.supabase_service_key
+            ))
+            
+            # Convert to expected format
+            return {
+                'successful_uploads': result['upload_stats']['successful_uploads'],
+                'failed_uploads': result['upload_stats']['failed_uploads'],
+                'embedding_errors': result['failed_embeddings'],
+                'total_chunks': result['chunks_processed'],
+                'performance_stats': result.get('performance_stats', {})
+            }
+            
+        except Exception as e:
+            print(f"Enhanced processing failed, falling back to original: {e}")
+            # Fall back to basic implementation
+            pass
+        
+        # Basic implementation (fallback)
         try:
             # Get user's Supabase client
             supabase = self.get_supabase_client()
